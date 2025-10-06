@@ -1,3 +1,41 @@
+Metadata-Version: 2.4
+Name: guardian-content-fetcher
+Version: 1.0.0
+Summary: A tool to fetch Guardian articles and publish to message brokers
+Author: Northcoders Data Engineering Team
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests>=2.31.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: boto3>=1.28.0
+Requires-Dist: botocore>=1.31.0
+Requires-Dist: pytest>=7.4.0
+Requires-Dist: pytest-cov>=4.1.0
+Requires-Dist: black>=23.0.0
+Requires-Dist: flake8>=6.0.0
+Requires-Dist: mypy>=1.5.0
+Requires-Dist: bandit>=1.7.0
+Requires-Dist: safety>=2.3.0
+Requires-Dist: sphinx>=7.0.0
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
 # Guardian Content Fetcher
 
 **A robust Python application for fetching articles from Guardian API and publishing to message brokers**

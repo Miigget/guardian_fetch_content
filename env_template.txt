@@ -1,0 +1,34 @@
+# Guardian Content Fetcher Environment Configuration Template
+# Copy this content to a .env file and fill in your actual values
+
+# Guardian API Configuration (Required)
+# Get your free API key from: https://open-platform.theguardian.com/access/
+GUARDIAN_API_KEY=your-guardian-api-key-here
+
+# AWS Configuration (Optional - will use IAM roles if not provided)
+# If running on EC2 or Lambda, these can be omitted to use IAM roles
+# AWS_ACCESS_KEY_ID=your-aws-access-key-id
+# AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
+
+# AWS Region (Optional - defaults to us-east-1)
+AWS_DEFAULT_REGION=us-east-1
+
+# Kinesis Stream Configuration (Required unless using mock)
+# Name of the Kinesis stream to publish articles to
+KINESIS_STREAM_NAME=guardian-content
+
+# Application Configuration (Optional)
+# Use mock broker instead of Kinesis (useful for testing)
+# USE_MOCK_BROKER=false
+
+# Logging Configuration (Optional)
+# LOG_LEVEL=INFO
+
+# Guardian API Rate Limiting (Optional - seconds between requests)
+# GUARDIAN_RATE_LIMIT_DELAY=2.0
+
+# Example usage:
+# 1. Copy this file to .env
+# 2. Replace the placeholder values with your actual credentials
+# 3. Run: python -m guardian_content_fetcher.cli "machine learning"
+# 4. Or use: guardian-fetch "machine learning" --date-from 2023-01-01

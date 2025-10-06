@@ -1,0 +1,2 @@
+[console_scripts]
+guardian-fetch = guardian_content_fetcher.cli:main
