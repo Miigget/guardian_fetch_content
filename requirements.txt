@@ -3,19 +3,6 @@ requests>=2.31.0
 python-dotenv>=1.0.0
 
 # AWS dependencies (for Kinesis)
+# NOTE: boto3 is included in the AWS Lambda runtime and is excluded 
+# from the deployment package by the build_lambda_package.py script.
 boto3>=1.28.0
-botocore>=1.31.0
-
-# Development dependencies
-pytest>=7.4.0
-pytest-cov>=4.1.0
-black>=23.0.0
-flake8>=6.0.0
-mypy>=1.5.0
-
-# Security scanning
-bandit>=1.7.0
-safety>=2.3.0
-
-# Documentation
-sphinx>=7.0.0

@@ -97,7 +97,7 @@ class TestLoadConfiguration:
         config = load_configuration(cli_args)
         
         assert config['guardian_api_key'] == "test-guardian-api-key"
-        assert config['aws_region'] == "us-east-1"
+        assert config['aws_region'] == "eu-west-2"
         assert config['kinesis_stream_name'] == "test-stream"
         assert config['search_term'] == "machine learning"
         assert config['date_from'] == "2023-01-01"
@@ -149,7 +149,7 @@ class TestLoadConfiguration:
         config = load_configuration(args)
         
         assert config['kinesis_stream_name'] == "test-stream"  # From env
-        assert config['aws_region'] == "us-east-1"  # From env
+        assert config['aws_region'] == "eu-west-2"  # From env
 
 
 class TestValidateConfiguration:
@@ -318,7 +318,7 @@ class TestRunFetchAndPublish:
             'use_mock': False,
             'guardian_api_key': 'test-key',
             'kinesis_stream_name': 'test-stream',
-            'aws_region': 'us-east-1',
+            'aws_region': 'eu-west-2',
             'aws_access_key_id': 'aws-key',
             'aws_secret_access_key': 'aws-secret',
             'search_term': 'test',
@@ -332,7 +332,7 @@ class TestRunFetchAndPublish:
         mock_factory.assert_called_once_with(
             guardian_api_key='test-key',
             kinesis_stream_name='test-stream',
-            aws_region='us-east-1',
+            aws_region='eu-west-2',
             aws_access_key_id='aws-key',
             aws_secret_access_key='aws-secret'
         )
@@ -385,7 +385,7 @@ class TestRunFetchAndPublish:
             'use_mock': False,
             'guardian_api_key': 'test-key',
             'kinesis_stream_name': 'test-stream',
-            'aws_region': 'us-east-1',
+            'aws_region': 'eu-west-2',
             'aws_access_key_id': None,
             'aws_secret_access_key': None,
             'search_term': 'test',

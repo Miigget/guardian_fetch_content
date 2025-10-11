@@ -108,7 +108,7 @@ def load_config_from_env() -> AppConfig:
         GUARDIAN_API_KEY: Guardian API key (required)
         AWS_ACCESS_KEY_ID: AWS access key ID (optional)
         AWS_SECRET_ACCESS_KEY: AWS secret access key (optional)
-        AWS_DEFAULT_REGION: AWS region (default: us-east-1)
+        AWS_DEFAULT_REGION: AWS region (default: eu-west-2)
         KINESIS_STREAM_NAME: Kinesis stream name (default: guardian-content)
         LOG_LEVEL: Logging level (default: INFO)
         USE_MOCK_BROKER: Use mock broker instead of Kinesis (default: false)
@@ -129,7 +129,7 @@ def load_config_from_env() -> AppConfig:
         
         # Load AWS configuration
         aws_config = AWSConfig(
-            region=os.getenv('AWS_DEFAULT_REGION', 'us-east-1'),
+            region=os.getenv('AWS_DEFAULT_REGION', 'eu-west-2'),
             access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
             secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
         )
@@ -170,7 +170,7 @@ def load_config_from_env() -> AppConfig:
 def create_config_dict(
     guardian_api_key: str,
     kinesis_stream_name: Optional[str] = None,
-    aws_region: str = 'us-east-1',
+    aws_region: str = 'eu-west-2',
     aws_access_key_id: Optional[str] = None,
     aws_secret_access_key: Optional[str] = None,
     use_mock_broker: bool = False,
@@ -186,7 +186,7 @@ def create_config_dict(
     Args:
         guardian_api_key (str): Guardian API key
         kinesis_stream_name (Optional[str]): Kinesis stream name
-        aws_region (str): AWS region (default: us-east-1)
+        aws_region (str): AWS region (default: eu-west-2)
         aws_access_key_id (Optional[str]): AWS access key ID
         aws_secret_access_key (Optional[str]): AWS secret access key
         use_mock_broker (bool): Use mock broker (default: False)
@@ -306,8 +306,8 @@ GUARDIAN_API_KEY=your-guardian-api-key-here
 # AWS_ACCESS_KEY_ID=your-aws-access-key-id
 # AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
 
-# AWS Region (Optional - defaults to us-east-1)
-AWS_DEFAULT_REGION=us-east-1
+# AWS Region (Optional - defaults to eu-west-2)
+AWS_DEFAULT_REGION=eu-west-2
 
 # Kinesis Stream Configuration (Required unless using mock)
 # Name of the Kinesis stream to publish articles to

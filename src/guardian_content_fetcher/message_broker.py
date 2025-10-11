@@ -91,7 +91,7 @@ class KinesisPublisher(MessageBrokerPublisher):
     def __init__(
         self, 
         stream_name: str, 
-        region_name: str = 'us-east-1',
+        region_name: str = 'eu-west-2',
         aws_access_key_id: Optional[str] = None,
         aws_secret_access_key: Optional[str] = None
     ):
@@ -100,7 +100,7 @@ class KinesisPublisher(MessageBrokerPublisher):
         
         Args:
             stream_name (str): Name of the Kinesis stream to publish to
-            region_name (str): AWS region name (default: us-east-1)
+            region_name (str): AWS region name (default: eu-west-2)
             aws_access_key_id (Optional[str]): AWS access key ID (if not using IAM roles)
             aws_secret_access_key (Optional[str]): AWS secret key (if not using IAM roles)
             

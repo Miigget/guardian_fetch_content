@@ -49,7 +49,7 @@ class TestAWSConfig:
         """Test AWS config with default values."""
         config = AWSConfig()
         
-        assert config.region == "us-east-1"
+        assert config.region == "eu-west-2"
         assert config.access_key_id is None
         assert config.secret_access_key is None
     
@@ -129,7 +129,7 @@ class TestLoadConfigFromEnv:
         assert isinstance(config, AppConfig)
         assert config.guardian_config.api_key == "test-guardian-api-key"
         assert config.kinesis_config.stream_name == "test-stream"
-        assert config.kinesis_config.aws_config.region == "us-east-1"
+        assert config.kinesis_config.aws_config.region == "eu-west-2"
         assert config.kinesis_config.aws_config.access_key_id == "test-aws-key"
         assert config.kinesis_config.aws_config.secret_access_key == "test-aws-secret"
         assert config.log_level == "INFO"
@@ -237,7 +237,7 @@ class TestCreateConfigDict:
             kinesis_stream_name="test-stream"
         )
         
-        assert config_dict['aws_region'] == "us-east-1"
+        assert config_dict['aws_region'] == "eu-west-2"
         assert config_dict['aws_access_key_id'] is None
         assert config_dict['aws_secret_access_key'] is None
         assert config_dict['use_mock_broker'] is False
@@ -327,7 +327,7 @@ class TestValidateAWSCredentials:
         assert result is True
         mock_boto_client.assert_called_once_with(
             'sts',
-            region_name='us-east-1',
+            region_name='eu-west-2',
             aws_access_key_id='test-key',
             aws_secret_access_key='test-secret'
         )
@@ -345,7 +345,7 @@ class TestValidateAWSCredentials:
         result = validate_aws_credentials(aws_config)
         
         assert result is True
-        mock_boto_client.assert_called_once_with('sts', region_name='us-east-1')
+        mock_boto_client.assert_called_once_with('sts', region_name='eu-west-2')
     
     @patch('boto3.client')
     def test_validate_credentials_no_credentials_error(self, mock_boto_client):

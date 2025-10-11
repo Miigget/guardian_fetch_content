@@ -254,8 +254,8 @@ class TestGuardianContentFetcher:
 class TestGuardianContentFetcherFactory:
     """Test cases for GuardianContentFetcherFactory class."""
     
-    @patch('guardian_content_fetcher.content_fetcher.KinesisPublisher')
-    @patch('guardian_content_fetcher.content_fetcher.GuardianAPIClient')
+    @patch('guardian_content_fetcher.message_broker.KinesisPublisher')
+    @patch('guardian_content_fetcher.api_client.GuardianAPIClient')
     def test_create_with_kinesis(self, mock_api_client_class, mock_kinesis_publisher_class):
         """Test factory method for creating fetcher with Kinesis."""
         mock_api_client = Mock()
@@ -287,8 +287,8 @@ class TestGuardianContentFetcherFactory:
         assert fetcher.api_client == mock_api_client
         assert fetcher.message_broker == mock_kinesis_publisher
     
-    @patch('guardian_content_fetcher.content_fetcher.KinesisPublisher')
-    @patch('guardian_content_fetcher.content_fetcher.GuardianAPIClient')
+    @patch('guardian_content_fetcher.message_broker.KinesisPublisher')
+    @patch('guardian_content_fetcher.api_client.GuardianAPIClient')
     def test_create_with_kinesis_default_params(self, mock_api_client_class, mock_kinesis_publisher_class):
         """Test factory method with default parameters."""
         mock_api_client_class.return_value = Mock()
@@ -302,14 +302,14 @@ class TestGuardianContentFetcherFactory:
         # Verify default parameters were used
         mock_kinesis_publisher_class.assert_called_once_with(
             stream_name="test-stream",
-            region_name="us-east-1",  # Default region
+            region_name="eu-west-2",  # Default region
             aws_access_key_id=None,
             aws_secret_access_key=None
         )
         
         assert isinstance(fetcher, GuardianContentFetcher)
     
-    @patch('guardian_content_fetcher.content_fetcher.KinesisPublisher')
+    @patch('guardian_content_fetcher.message_broker.KinesisPublisher')
     def test_create_with_kinesis_error(self, mock_kinesis_publisher_class):
         """Test factory method error handling."""
         mock_kinesis_publisher_class.side_effect = Exception("Kinesis error")
@@ -320,8 +320,8 @@ class TestGuardianContentFetcherFactory:
                 kinesis_stream_name="test-stream"
             )
     
-    @patch('guardian_content_fetcher.content_fetcher.MockPublisher')
-    @patch('guardian_content_fetcher.content_fetcher.GuardianAPIClient')
+    @patch('guardian_content_fetcher.message_broker.MockPublisher')
+    @patch('guardian_content_fetcher.api_client.GuardianAPIClient')
     def test_create_with_mock(self, mock_api_client_class, mock_mock_publisher_class):
         """Test factory method for creating fetcher with mock publisher."""
         mock_api_client = Mock()
@@ -344,7 +344,7 @@ class TestGuardianContentFetcherFactory:
         assert fetcher.api_client == mock_api_client
         assert fetcher.message_broker == mock_publisher
     
-    @patch('guardian_content_fetcher.content_fetcher.GuardianAPIClient')
+    @patch('guardian_content_fetcher.api_client.GuardianAPIClient')
     def test_create_with_mock_error(self, mock_api_client_class):
         """Test factory method error handling for mock creation."""
         mock_api_client_class.side_effect = Exception("API client error")

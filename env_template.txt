@@ -10,12 +10,12 @@ GUARDIAN_API_KEY=your-guardian-api-key-here
 # AWS_ACCESS_KEY_ID=your-aws-access-key-id
 # AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
 
-# AWS Region (Optional - defaults to us-east-1)
-AWS_DEFAULT_REGION=us-east-1
+# AWS Region (Optional - defaults to eu-west-2)
+AWS_DEFAULT_REGION=eu-west-2
 
 # Kinesis Stream Configuration (Required unless using mock)
 # Name of the Kinesis stream to publish articles to
-KINESIS_STREAM_NAME=guardian-content
+KINESIS_STREAM_NAME=guardian_fetcher
 
 # Application Configuration (Optional)
 # Use mock broker instead of Kinesis (useful for testing)

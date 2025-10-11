@@ -104,13 +104,13 @@ class TestKinesisPublisher:
         """Test successful KinesisPublisher initialization."""
         publisher = KinesisPublisher(
             stream_name="test-stream",
-            region_name="us-east-1",
+            region_name="eu-west-2",
             aws_access_key_id="test-key",
             aws_secret_access_key="test-secret"
         )
         
         assert publisher.stream_name == "test-stream"
-        assert publisher.region_name == "us-east-1"
+        assert publisher.region_name == "eu-west-2"
         
         # Verify that describe_stream was called to verify stream existence
         mock_kinesis_client.describe_stream.assert_called_once_with(StreamName="test-stream")
@@ -337,7 +337,7 @@ class TestKinesisPublisher:
         publisher = KinesisPublisher("test-stream")
         
         assert publisher.stream_name == "test-stream"
-        assert publisher.region_name == "us-east-1"  # Default region
+        assert publisher.region_name == "eu-west-2"  # Default region
     
     def test_initialization_custom_region(self, mock_kinesis_client):
         """Test initialization with custom AWS region."""

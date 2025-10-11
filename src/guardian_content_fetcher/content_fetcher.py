@@ -219,7 +219,7 @@ class GuardianContentFetcher:
             raise
         except Exception as e:
             logger.error(f"Unexpected error fetching articles: {e}")
-            raise GuardianAPIError(f"Unexpected error during article fetch: {e}")
+            raise
     
     def _publish_articles(self, articles: List[Dict[str, Any]]) -> int:
         """
@@ -258,9 +258,7 @@ class GuardianContentFetcher:
                 
         except MessageBrokerError as e:
             logger.error(f"Batch publishing failed: {e}")
-            # Try individual publishing as fallback
-            logger.info("Attempting individual article publishing as fallback")
-            return self._publish_articles_individually(articles)
+            raise
         except Exception as e:
             logger.error(f"Unexpected error during batch publishing: {e}")
             raise MessageBrokerError(f"Unexpected error during publishing: {e}")
@@ -334,7 +332,7 @@ class GuardianContentFetcherFactory:
     def create_with_kinesis(
         guardian_api_key: str,
         kinesis_stream_name: str,
-        aws_region: str = 'us-east-1',
+        aws_region: str = 'eu-west-2',
         aws_access_key_id: Optional[str] = None,
         aws_secret_access_key: Optional[str] = None
     ) -> GuardianContentFetcher:
@@ -344,7 +342,7 @@ class GuardianContentFetcherFactory:
         Args:
             guardian_api_key (str): Guardian API key for authentication
             kinesis_stream_name (str): Name of the Kinesis stream
-            aws_region (str): AWS region for Kinesis (default: us-east-1)
+            aws_region (str): AWS region for Kinesis (default: eu-west-2)
             aws_access_key_id (Optional[str]): AWS access key ID
             aws_secret_access_key (Optional[str]): AWS secret access key
             

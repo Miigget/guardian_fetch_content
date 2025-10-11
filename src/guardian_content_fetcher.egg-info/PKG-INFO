@@ -18,15 +18,6 @@ License-File: LICENSE
 Requires-Dist: requests>=2.31.0
 Requires-Dist: python-dotenv>=1.0.0
 Requires-Dist: boto3>=1.28.0
-Requires-Dist: botocore>=1.31.0
-Requires-Dist: pytest>=7.4.0
-Requires-Dist: pytest-cov>=4.1.0
-Requires-Dist: black>=23.0.0
-Requires-Dist: flake8>=6.0.0
-Requires-Dist: mypy>=1.5.0
-Requires-Dist: bandit>=1.7.0
-Requires-Dist: safety>=2.3.0
-Requires-Dist: sphinx>=7.0.0
 Dynamic: author
 Dynamic: classifier
 Dynamic: description

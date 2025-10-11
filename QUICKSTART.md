@@ -25,6 +25,9 @@ cd guardian_fetch_content
 # Install dependencies
 pip install -r requirements.txt
 
+# For development (testing, linting, etc.), install dev dependencies:
+pip install -r requirements-dev.txt
+
 # Install the package
 pip install -e .
 ```
@@ -70,6 +73,14 @@ echo "KINESIS_STREAM_NAME=guardian-content" >> .env
 # Create Kinesis stream (AWS CLI required)
 aws kinesis create-stream --stream-name guardian-content --shard-count 1
 ```
+
+## Step 6: Deploy to AWS Lambda (Optional)
+
+You can run this tool as a serverless function on AWS Lambda, which is ideal for scheduled or event-driven execution.
+
+For detailed, step-by-step instructions on how to package, configure, and deploy the application to AWS Lambda, please see the dedicated guide:
+
+➡️ **[Full Guide: Deploying to AWS Lambda](./DEPLOY_LAMBDA.md)**
 
 ## Quick Examples
 

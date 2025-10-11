@@ -199,8 +199,6 @@ def configure_logging(verbose: bool, quiet: bool) -> None:
         logger.info("Verbose logging enabled")
     elif quiet:
         logging.getLogger().setLevel(logging.ERROR)
-    else:
-        logging.getLogger().setLevel(logging.INFO)
 
 
 def validate_configuration(config: Dict[str, Any]) -> None:

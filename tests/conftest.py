@@ -172,7 +172,7 @@ def kinesis_publisher(mock_kinesis_client):
     """
     return KinesisPublisher(
         stream_name="test-stream",
-        region_name="us-east-1",
+            region_name="eu-west-2",
         aws_access_key_id="test-key",
         aws_secret_access_key="test-secret"
     )
@@ -201,7 +201,7 @@ def mock_environment_variables():
         'GUARDIAN_API_KEY': 'test-guardian-api-key',
         'AWS_ACCESS_KEY_ID': 'test-aws-key',
         'AWS_SECRET_ACCESS_KEY': 'test-aws-secret',
-        'AWS_DEFAULT_REGION': 'us-east-1',
+        'AWS_DEFAULT_REGION': 'eu-west-2',
         'KINESIS_STREAM_NAME': 'test-stream',
         'LOG_LEVEL': 'INFO',
         'USE_MOCK_BROKER': 'false'
@@ -226,7 +226,7 @@ def cli_args():
         date_from="2023-01-01",
         max_articles=10,
         stream_name="test-stream",
-        aws_region="us-east-1",
+        aws_region="eu-west-2",
         use_mock=False,
         output_format="text",
         verbose=False,

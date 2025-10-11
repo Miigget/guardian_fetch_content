@@ -6,6 +6,7 @@ src/guardian_content_fetcher/api_client.py
 src/guardian_content_fetcher/cli.py
 src/guardian_content_fetcher/config.py
 src/guardian_content_fetcher/content_fetcher.py
+src/guardian_content_fetcher/lambda_handler.py
 src/guardian_content_fetcher/message_broker.py
 src/guardian_content_fetcher.egg-info/PKG-INFO
 src/guardian_content_fetcher.egg-info/SOURCES.txt
