@@ -212,7 +212,8 @@ guardian_fetch_content/
 │   ├── message_broker.py        # Message broker publishers (Kinesis, Mock)
 │   ├── content_fetcher.py       # Main orchestrator class
 │   ├── config.py                # Configuration management
-│   └── cli.py                   # Command-line interface
+│   ├── cli.py                   # Command-line interface
+│   └── lambda_handler.py        # AWS Lambda handler
 ├── tests/                       # Comprehensive test suite
 │   ├── conftest.py             # Test fixtures and utilities
 │   ├── test_api_client.py      # API client tests
@@ -221,11 +222,16 @@ guardian_fetch_content/
 │   ├── test_config.py          # Configuration tests
 │   └── test_cli.py             # CLI tests
 ├── requirements.txt             # Python dependencies
+├── requirements-dev.txt         # Development dependencies
 ├── setup.py                     # Package configuration
-├── pytest.ini                  # Test configuration
+├── pyproject.toml              # Black, pytest, mypy configuration
+├── .flake8                     # Flake8 linting configuration (88 chars)
+├── pytest.ini                  # Test configuration (legacy)
 ├── run_tests.py                 # Test runner script
 ├── env_template.txt             # Environment configuration template
-└── README.md                    # This file
+├── README.md                    # This file
+├── CONTRIBUTING.md              # Contribution guidelines
+└── CODE_STYLE.md               # Detailed code style documentation
 ```
 
 ## 🧪 Testing
@@ -250,13 +256,13 @@ python -m pytest tests/test_api_client.py -v
 ### Quality Checks
 
 ```bash
-# Run all quality checks
+# Run all quality checks (unit tests, PEP-8, security)
 python run_tests.py
 
 # Individual checks
-python run_tests.py --lint-only      # Code style (flake8, black)
-python run_tests.py --type-check-only # Type checking (mypy)
-python run_tests.py --security-only   # Security (bandit, safety)
+python run_tests.py --tests-only    # Unit tests only
+python run_tests.py --lint-only     # Code style (flake8, black)
+python run_tests.py --security-only # Security (bandit)
 ```
 
 ## 🏗 Architecture
@@ -369,16 +375,39 @@ pip install -r requirements.txt
 pip install -e .
 
 # Install development dependencies
-pip install pytest pytest-cov black flake8 mypy bandit safety
+pip install -r requirements-dev.txt
 ```
 
 ### Code Quality Standards
 
-- **Style**: Black formatting, Flake8 linting
-- **Type Safety**: MyPy static type checking
-- **Security**: Bandit security scanning, Safety dependency checking
-- **Testing**: 90%+ test coverage requirement
+As required by project specification (task_description_pl.md):
+
+- **Style**: Black formatting (88 char), Flake8 linting (88 char) - PEP-8 compliant
+- **Testing**: 90%+ test coverage requirement with pytest
+- **Security**: Bandit security scanning for vulnerabilities
 - **Documentation**: Comprehensive docstrings and comments
+
+#### Code Style & Line Length
+
+This project uses **88 characters** as the maximum line length (Black's default):
+
+```bash
+# Format code with Black
+black src/ tests/
+
+# Check with Flake8 (configured for 88 chars in .flake8)
+flake8 src/ tests/
+```
+
+**Why 88 characters instead of PEP-8's 79?**
+- Black's default, widely accepted in the Python community
+- ~10% more space = fewer line breaks, better readability
+- Used by major projects: Django, pytest, FastAPI
+- More readable on modern displays
+
+**To switch to strict PEP-8 (79 characters):**
+
+See detailed instructions in [CODE_STYLE.md](CODE_STYLE.md) or [CONTRIBUTING.md](CONTRIBUTING.md#line-length-configuration)
 
 ### Contributing
 
@@ -451,13 +480,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ✅ Guardian API integration with rate limiting  
 ✅ AWS Kinesis message broker support  
-✅ Python 3.8+ with PEP-8 compliance  
+✅ Python 3.8+ with PEP-8 compliance (88 char line length via Black)  
 ✅ Comprehensive unit testing (90%+ coverage)  
-✅ Security vulnerability scanning  
+✅ Security vulnerability scanning (Bandit: 0 issues)  
 ✅ Environment variable configuration (no hardcoded credentials)  
 ✅ AWS Lambda compatible memory footprint  
 ✅ CLI interface for local demonstration  
 ✅ JSON message format with required fields  
 ✅ Content preview extension (first 1000 characters)  
 ✅ Error handling and logging  
-✅ Documentation and code comments
+✅ Documentation and code comments  
+
+**Code Style Note:** This project uses Black's 88-character line limit (widely accepted standard) rather than PEP-8's strict 79 characters. Both Black and Flake8 are configured consistently. Instructions to switch to 79 characters are provided in CONTRIBUTING.md if required.

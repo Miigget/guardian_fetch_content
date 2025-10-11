@@ -54,10 +54,44 @@ python run_tests.py --verbose         # Verbose output
 We follow strict code quality standards:
 
 - **PEP-8 Compliance**: All code must follow PEP-8 style guidelines
-- **Black Formatting**: Code is automatically formatted with Black
+- **Black Formatting**: Code is automatically formatted with Black (88 character line length)
+- **Flake8 Linting**: Configured to match Black's 88 character limit
 - **Type Hints**: All functions must include type hints
 - **Docstrings**: All modules, classes, and functions must have comprehensive docstrings
 - **Comments**: Complex logic should include explanatory comments
+
+#### Line Length Configuration
+
+This project uses **88 characters** as the maximum line length, which is Black's default:
+- **Black**: 88 characters (code formatter)
+- **Flake8**: 88 characters (linter, configured in `.flake8`)
+- **PEP-8**: Recommends 79, but 88 is a modern and popular convention
+
+**To format code:**
+```bash
+black src/ tests/
+```
+
+**To check code style:**
+```bash
+flake8 src/ tests/
+```
+
+**If you need to switch to PEP-8's strict 79 character limit:**
+1. Update `.flake8`:
+   ```ini
+   [flake8]
+   max-line-length = 79
+   ```
+2. Reformat code:
+   ```bash
+   black --line-length 79 src/ tests/
+   ```
+3. Add to `pyproject.toml` (create if needed):
+   ```toml
+   [tool.black]
+   line-length = 79
+   ```
 
 ### Code Quality Requirements
 

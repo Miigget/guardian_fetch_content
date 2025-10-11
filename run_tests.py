@@ -53,10 +53,10 @@ def run_linting():
     """Run code linting checks."""
     success = True
     
-    # Flake8 for style checking
+    # Flake8 for style checking (PEP-8 compliance)
     print("\n🔍 Running Flake8 style checks...")
     flake8_result = run_command(
-        ["python", "-m", "flake8", "src/", "tests/", "--max-line-length=100"],
+        ["python", "-m", "flake8", "src/", "tests/"],
         "Checking code style with Flake8"
     )
     success = success and flake8_result
@@ -64,41 +64,31 @@ def run_linting():
     # Black for code formatting check
     print("\n🔍 Running Black format checks...")
     black_result = run_command(
-        ["python", "-m", "black", "--check", "--diff", "src/", "tests/"],
+        ["python", "-m", "black", "--check", "src/", "tests/"],
         "Checking code formatting with Black"
     )
     success = success and black_result
     
     return success
 
-def run_type_checking():
-    """Run static type checking with mypy."""
-    return run_command(
-        ["python", "-m", "mypy", "src/guardian_content_fetcher/", "--ignore-missing-imports"],
-        "Running static type checking with MyPy"
-    )
+# Type checking removed - not required by project specification
+# def run_type_checking():
+#     """Run static type checking with mypy."""
+#     return run_command(
+#         ["python", "-m", "mypy", "src/guardian_content_fetcher/", "--ignore-missing-imports"],
+#         "Running static type checking with MyPy"
+#     )
 
 def run_security_checks():
-    """Run security vulnerability checks."""
-    success = True
-    
-    # Bandit for security issues
+    """Run security vulnerability checks (required by project spec)."""
+    # Bandit for security issues - REQUIRED by task_description_pl.md
     print("\n🔒 Running Bandit security checks...")
     bandit_result = run_command(
         ["python", "-m", "bandit", "-r", "src/", "-f", "json", "-o", "bandit-report.json"],
         "Checking for security vulnerabilities with Bandit"
     )
-    success = success and bandit_result
     
-    # Safety for known vulnerabilities in dependencies
-    print("\n🔒 Running Safety dependency checks...")
-    safety_result = run_command(
-        ["python", "-m", "safety", "check", "--json", "--output", "safety-report.json"],
-        "Checking dependencies for known vulnerabilities with Safety"
-    )
-    success = success and safety_result
-    
-    return success
+    return bandit_result
 
 def run_package_install():
     """Test package installation."""
@@ -108,15 +98,16 @@ def run_package_install():
     )
 
 def run_all_checks(verbose=False):
-    """Run all quality checks."""
+    """Run all quality checks (as required by task_description_pl.md)."""
     print("🧪 Guardian Content Fetcher - Quality Check Suite")
+    print("=" * 60)
+    print("Required checks: Unit Tests, PEP-8 Compliance, Security")
     print("=" * 60)
     
     checks = [
         ("Package Installation", lambda: run_package_install()),
         ("Unit Tests", lambda: run_unit_tests(verbose=verbose, coverage=True)),
-        ("Code Linting", lambda: run_linting()),
-        ("Type Checking", lambda: run_type_checking()),
+        ("Code Linting (PEP-8)", lambda: run_linting()),
         ("Security Checks", lambda: run_security_checks()),
     ]
     
@@ -161,10 +152,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python run_tests.py                    # Run all checks
+  python run_tests.py                    # Run all required checks
   python run_tests.py --tests-only       # Run only unit tests
-  python run_tests.py --lint-only        # Run only linting
-  python run_tests.py --security-only    # Run only security checks
+  python run_tests.py --lint-only        # Run only linting (PEP-8)
+  python run_tests.py --security-only    # Run only security checks (Bandit)
   python run_tests.py --verbose          # Verbose output
         """
     )
@@ -181,11 +172,12 @@ Examples:
         help="Run only linting checks"
     )
     
-    parser.add_argument(
-        "--type-check-only",
-        action="store_true",
-        help="Run only type checking"
-    )
+    # Type checking removed - not required by project
+    # parser.add_argument(
+    #     "--type-check-only",
+    #     action="store_true",
+    #     help="Run only type checking"
+    # )
     
     parser.add_argument(
         "--security-only",
@@ -225,14 +217,12 @@ Examples:
         success = run_unit_tests(verbose=args.verbose, coverage=args.coverage)
     elif args.lint_only:
         success = run_linting()
-    elif args.type_check_only:
-        success = run_type_checking()
     elif args.security_only:
         success = run_security_checks()
     elif args.install_only:
         success = run_package_install()
     else:
-        # Run all checks
+        # Run all required checks
         success = run_all_checks(verbose=args.verbose)
     
     return 0 if success else 1

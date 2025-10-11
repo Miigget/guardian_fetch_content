@@ -6,9 +6,8 @@ used across all test modules.
 """
 
 import pytest
-import json
 from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 from guardian_content_fetcher.api_client import GuardianAPIClient
 from guardian_content_fetcher.message_broker import MockPublisher, KinesisPublisher
@@ -19,7 +18,7 @@ from guardian_content_fetcher.content_fetcher import GuardianContentFetcher
 def sample_guardian_api_response():
     """
     Sample Guardian API response for testing.
-    
+
     Returns:
         Dict: Mock API response with sample articles
     """
@@ -39,26 +38,42 @@ def sample_guardian_api_response():
                     "sectionName": "Technology",
                     "webPublicationDate": "2023-01-01T10:00:00Z",
                     "webTitle": "Machine Learning Advances in 2023",
-                    "webUrl": "https://www.theguardian.com/technology/2023/jan/01/machine-learning-advances",
-                    "apiUrl": "https://content.guardianapis.com/technology/2023/jan/01/machine-learning-advances",
+                    "webUrl": (
+                        "https://www.theguardian.com/technology/2023/jan/01/"
+                        "machine-learning-advances"
+                    ),
+                    "apiUrl": (
+                        "https://content.guardianapis.com/technology/"
+                        "2023/jan/01/machine-learning-advances"
+                    ),
                     "fields": {
-                        "bodyText": "This is a sample article about machine learning advances. " * 50
-                    }
+                        "bodyText": (
+                            "This is a sample article about machine learning "
+                            "advances. " * 50
+                        )
+                    },
                 },
                 {
                     "id": "technology/2023/jan/02/ai-breakthrough",
-                    "type": "article", 
+                    "type": "article",
                     "sectionId": "technology",
                     "sectionName": "Technology",
                     "webPublicationDate": "2023-01-02T15:30:00Z",
                     "webTitle": "AI Breakthrough in Natural Language Processing",
-                    "webUrl": "https://www.theguardian.com/technology/2023/jan/02/ai-breakthrough",
-                    "apiUrl": "https://content.guardianapis.com/technology/2023/jan/02/ai-breakthrough",
+                    "webUrl": (
+                        "https://www.theguardian.com/technology/2023/jan/02/"
+                        "ai-breakthrough"
+                    ),
+                    "apiUrl": (
+                        "https://content.guardianapis.com/technology/"
+                        "2023/jan/02/ai-breakthrough"
+                    ),
                     "fields": {
-                        "bodyText": "Another sample article about AI developments. " * 30
-                    }
-                }
-            ]
+                        "bodyText": "Another sample article about AI developments. "
+                        * 30
+                    },
+                },
+            ],
         }
     }
 
@@ -67,7 +82,7 @@ def sample_guardian_api_response():
 def sample_formatted_articles():
     """
     Sample formatted articles as returned by GuardianAPIClient.
-    
+
     Returns:
         List: List of formatted article dictionaries
     """
@@ -75,15 +90,25 @@ def sample_formatted_articles():
         {
             "webPublicationDate": "2023-01-01T10:00:00Z",
             "webTitle": "Machine Learning Advances in 2023",
-            "webUrl": "https://www.theguardian.com/technology/2023/jan/01/machine-learning-advances",
-            "content_preview": "This is a sample article about machine learning advances. " * 20 + "..."
+            "webUrl": (
+                "https://www.theguardian.com/technology/2023/jan/01/"
+                "machine-learning-advances"
+            ),
+            "content_preview": (
+                "This is a sample article about machine learning advances. " * 20
+                + "..."
+            ),
         },
         {
-            "webPublicationDate": "2023-01-02T15:30:00Z", 
+            "webPublicationDate": "2023-01-02T15:30:00Z",
             "webTitle": "AI Breakthrough in Natural Language Processing",
-            "webUrl": "https://www.theguardian.com/technology/2023/jan/02/ai-breakthrough",
-            "content_preview": "Another sample article about AI developments. " * 20 + "..."
-        }
+            "webUrl": (
+                "https://www.theguardian.com/technology/2023/jan/02/" "ai-breakthrough"
+            ),
+            "content_preview": (
+                "Another sample article about AI developments. " * 20 + "..."
+            ),
+        },
     ]
 
 
@@ -91,11 +116,11 @@ def sample_formatted_articles():
 def mock_requests_get():
     """
     Mock for requests.get method.
-    
+
     Returns:
         Mock: Configured mock for requests.get
     """
-    with patch('requests.get') as mock_get:
+    with patch("requests.get") as mock_get:
         yield mock_get
 
 
@@ -103,7 +128,7 @@ def mock_requests_get():
 def guardian_api_client():
     """
     Guardian API client instance for testing.
-    
+
     Returns:
         GuardianAPIClient: Test API client instance
     """
@@ -114,7 +139,7 @@ def guardian_api_client():
 def mock_publisher():
     """
     Mock message broker publisher for testing.
-    
+
     Returns:
         MockPublisher: Mock publisher instance
     """
@@ -125,40 +150,40 @@ def mock_publisher():
 def mock_kinesis_client():
     """
     Mock boto3 Kinesis client for testing.
-    
+
     Returns:
         Mock: Configured mock for boto3 Kinesis client
     """
-    with patch('boto3.client') as mock_client:
+    with patch("boto3.client") as mock_client:
         # Configure the mock client
         client_instance = MagicMock()
         mock_client.return_value = client_instance
-        
+
         # Mock successful stream description
         client_instance.describe_stream.return_value = {
-            'StreamDescription': {
-                'StreamStatus': 'ACTIVE',
-                'StreamName': 'test-stream'
+            "StreamDescription": {
+                "StreamStatus": "ACTIVE",
+                "StreamName": "test-stream",
             }
         }
-        
+
         # Mock successful put_record
         client_instance.put_record.return_value = {
-            'SequenceNumber': '12345678901234567890',
-            'ShardId': 'shardId-000000000000'
+            "SequenceNumber": "12345678901234567890",
+            "ShardId": "shardId-000000000000",
         }
-        
+
         # Mock successful put_records
         client_instance.put_records.return_value = {
-            'FailedRecordCount': 0,
-            'Records': [
+            "FailedRecordCount": 0,
+            "Records": [
                 {
-                    'SequenceNumber': '12345678901234567890',
-                    'ShardId': 'shardId-000000000000'
+                    "SequenceNumber": "12345678901234567890",
+                    "ShardId": "shardId-000000000000",
                 }
-            ]
+            ],
         }
-        
+
         yield client_instance
 
 
@@ -166,15 +191,15 @@ def mock_kinesis_client():
 def kinesis_publisher(mock_kinesis_client):
     """
     Kinesis publisher instance for testing.
-    
+
     Returns:
         KinesisPublisher: Test Kinesis publisher instance
     """
     return KinesisPublisher(
         stream_name="test-stream",
-            region_name="eu-west-2",
+        region_name="eu-west-2",
         aws_access_key_id="test-key",
-        aws_secret_access_key="test-secret"
+        aws_secret_access_key="test-secret",
     )
 
 
@@ -182,7 +207,7 @@ def kinesis_publisher(mock_kinesis_client):
 def content_fetcher(guardian_api_client, mock_publisher):
     """
     Guardian Content Fetcher instance for testing.
-    
+
     Returns:
         GuardianContentFetcher: Test fetcher instance
     """
@@ -193,21 +218,21 @@ def content_fetcher(guardian_api_client, mock_publisher):
 def mock_environment_variables():
     """
     Mock environment variables for testing configuration.
-    
+
     Returns:
         Dict: Dictionary of environment variables
     """
     env_vars = {
-        'GUARDIAN_API_KEY': 'test-guardian-api-key',
-        'AWS_ACCESS_KEY_ID': 'test-aws-key',
-        'AWS_SECRET_ACCESS_KEY': 'test-aws-secret',
-        'AWS_DEFAULT_REGION': 'eu-west-2',
-        'KINESIS_STREAM_NAME': 'test-stream',
-        'LOG_LEVEL': 'INFO',
-        'USE_MOCK_BROKER': 'false'
+        "GUARDIAN_API_KEY": "test-guardian-api-key",
+        "AWS_ACCESS_KEY_ID": "test-aws-key",
+        "AWS_SECRET_ACCESS_KEY": "test-aws-secret",
+        "AWS_DEFAULT_REGION": "eu-west-2",
+        "KINESIS_STREAM_NAME": "test-stream",
+        "LOG_LEVEL": "INFO",
+        "USE_MOCK_BROKER": "false",
     }
-    
-    with patch.dict('os.environ', env_vars, clear=True):
+
+    with patch.dict("os.environ", env_vars, clear=True):
         yield env_vars
 
 
@@ -215,12 +240,12 @@ def mock_environment_variables():
 def cli_args():
     """
     Sample CLI arguments for testing.
-    
+
     Returns:
         argparse.Namespace: Mock CLI arguments
     """
     from argparse import Namespace
-    
+
     return Namespace(
         search_term="machine learning",
         date_from="2023-01-01",
@@ -230,7 +255,7 @@ def cli_args():
         use_mock=False,
         output_format="text",
         verbose=False,
-        quiet=False
+        quiet=False,
     )
 
 
@@ -238,51 +263,42 @@ def cli_args():
 def error_response():
     """
     Sample error response from Guardian API.
-    
+
     Returns:
         Dict: Mock error response
     """
-    return {
-        "response": {
-            "status": "error",
-            "message": "Invalid API key"
-        }
-    }
+    return {"response": {"status": "error", "message": "Invalid API key"}}
 
 
 @pytest.fixture
 def empty_response():
     """
     Sample empty response from Guardian API (no articles found).
-    
+
     Returns:
         Dict: Mock empty response
     """
-    return {
-        "response": {
-            "status": "ok",
-            "total": 0,
-            "results": []
-        }
-    }
+    return {"response": {"status": "ok", "total": 0, "results": []}}
 
 
 @pytest.fixture
 def large_article_batch():
     """
     Large batch of articles for testing batch operations.
-    
+
     Returns:
         List: List of 100 sample articles
     """
     articles = []
     for i in range(100):
-        articles.append({
-            "webPublicationDate": f"2023-01-{i+1:02d}T10:00:00Z",
-            "webTitle": f"Sample Article {i+1}",
-            "webUrl": f"https://www.theguardian.com/article-{i+1}",
-            "content_preview": f"This is sample article number {i+1}. " * 10
-        })
+        articles.append(
+            {
+                "webPublicationDate": f"2023-01-{i+1:02d}T10:00:00Z",
+                "webTitle": f"Sample Article {i+1}",
+                "webUrl": f"https://www.theguardian.com/article-{i+1}",
+                "content_preview": f"This is sample article number {i+1}. " * 10,
+            }
+        )
     return articles
 
 
@@ -290,11 +306,11 @@ def large_article_batch():
 def create_mock_response(data: Dict[str, Any], status_code: int = 200):
     """
     Create a mock HTTP response object.
-    
+
     Args:
         data (Dict[str, Any]): Response data
         status_code (int): HTTP status code
-        
+
     Returns:
         Mock: Mock response object
     """
@@ -308,11 +324,11 @@ def create_mock_response(data: Dict[str, Any], status_code: int = 200):
 def assert_article_format(article: Dict[str, Any]):
     """
     Assert that an article has the required format.
-    
+
     Args:
         article (Dict[str, Any]): Article to validate
     """
-    required_fields = ['webPublicationDate', 'webTitle', 'webUrl']
+    required_fields = ["webPublicationDate", "webTitle", "webUrl"]
     for field in required_fields:
         assert field in article, f"Missing required field: {field}"
         assert isinstance(article[field], str), f"Field {field} should be string"
@@ -322,23 +338,27 @@ def assert_article_format(article: Dict[str, Any]):
 def assert_valid_result_format(result: Dict[str, Any]):
     """
     Assert that a fetch_and_publish result has the correct format.
-    
+
     Args:
         result (Dict[str, Any]): Result to validate
     """
     required_fields = [
-        'success', 'articles_found', 'articles_published',
-        'search_term', 'date_from', 'errors'
+        "success",
+        "articles_found",
+        "articles_published",
+        "search_term",
+        "date_from",
+        "errors",
     ]
-    
+
     for field in required_fields:
         assert field in result, f"Missing required field: {field}"
-    
-    assert isinstance(result['success'], bool)
-    assert isinstance(result['articles_found'], int)
-    assert isinstance(result['articles_published'], int)
-    assert isinstance(result['search_term'], str)
-    assert isinstance(result['errors'], list)
-    assert result['articles_found'] >= 0
-    assert result['articles_published'] >= 0
-    assert result['articles_published'] <= result['articles_found']
+
+    assert isinstance(result["success"], bool)
+    assert isinstance(result["articles_found"], int)
+    assert isinstance(result["articles_published"], int)
+    assert isinstance(result["search_term"], str)
+    assert isinstance(result["errors"], list)
+    assert result["articles_found"] >= 0
+    assert result["articles_published"] >= 0
+    assert result["articles_published"] <= result["articles_found"]

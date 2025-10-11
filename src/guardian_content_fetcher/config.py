@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 class ConfigurationError(Exception):
     """Custom exception for configuration related errors."""
+
     pass
 
 
@@ -27,31 +28,33 @@ class ConfigurationError(Exception):
 class GuardianConfig:
     """
     Configuration class for Guardian API settings.
-    
+
     Attributes:
         api_key (str): Guardian API key for authentication
         rate_limit_delay (float): Delay between API calls in seconds
     """
+
     api_key: str
     rate_limit_delay: float = 2.0
-    
+
     def __post_init__(self):
         """Validate Guardian configuration after initialization."""
         if not self.api_key:
             raise ConfigurationError("Guardian API key is required")
 
 
-@dataclass 
+@dataclass
 class AWSConfig:
     """
     Configuration class for AWS settings.
-    
+
     Attributes:
         region (str): AWS region name
         access_key_id (Optional[str]): AWS access key ID
         secret_access_key (Optional[str]): AWS secret access key
     """
-    region: str = 'eu-west-2'
+
+    region: str = "eu-west-2"
     access_key_id: Optional[str] = None
     secret_access_key: Optional[str] = None
 
@@ -60,14 +63,15 @@ class AWSConfig:
 class KinesisConfig:
     """
     Configuration class for Kinesis settings.
-    
+
     Attributes:
         stream_name (str): Name of the Kinesis stream
         aws_config (AWSConfig): AWS configuration for Kinesis
     """
+
     stream_name: str
     aws_config: AWSConfig
-    
+
     def __post_init__(self):
         """Validate Kinesis configuration after initialization."""
         if not self.stream_name:
@@ -78,32 +82,33 @@ class KinesisConfig:
 class AppConfig:
     """
     Main application configuration.
-    
+
     Attributes:
         guardian_config (GuardianConfig): Guardian API configuration
         kinesis_config (Optional[KinesisConfig]): Kinesis configuration
         log_level (str): Logging level
         use_mock_broker (bool): Whether to use mock message broker
     """
+
     guardian_config: GuardianConfig
     kinesis_config: Optional[KinesisConfig] = None
-    log_level: str = 'INFO'
+    log_level: str = "INFO"
     use_mock_broker: bool = False
 
 
 def load_config_from_env() -> AppConfig:
     """
     Load application configuration from environment variables.
-    
+
     This function reads configuration values from environment variables
     and creates a complete configuration object with validation.
-    
+
     Returns:
         AppConfig: Loaded and validated application configuration
-        
+
     Raises:
         ConfigurationError: If required configuration is missing or invalid
-        
+
     Environment Variables:
         GUARDIAN_API_KEY: Guardian API key (required)
         AWS_ACCESS_KEY_ID: AWS access key ID (optional)
@@ -115,52 +120,52 @@ def load_config_from_env() -> AppConfig:
     """
     try:
         # Load Guardian API configuration
-        guardian_api_key = os.getenv('GUARDIAN_API_KEY')
+        guardian_api_key = os.getenv("GUARDIAN_API_KEY")
         if not guardian_api_key:
             raise ConfigurationError(
                 "GUARDIAN_API_KEY environment variable is required. "
-                "Get your free API key from: https://open-platform.theguardian.com/access/"
+                "Get your free API key from: "
+                "https://open-platform.theguardian.com/access/"
             )
-        
+
         guardian_config = GuardianConfig(
             api_key=guardian_api_key,
-            rate_limit_delay=float(os.getenv('GUARDIAN_RATE_LIMIT_DELAY', '2.0'))
+            rate_limit_delay=float(os.getenv("GUARDIAN_RATE_LIMIT_DELAY", "2.0")),
         )
-        
+
         # Load AWS configuration
         aws_config = AWSConfig(
-            region=os.getenv('AWS_DEFAULT_REGION', 'eu-west-2'),
-            access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-            secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+            region=os.getenv("AWS_DEFAULT_REGION", "eu-west-2"),
+            access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+            secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
         )
-        
+
         # Load Kinesis configuration (optional if using mock)
-        use_mock_broker = os.getenv('USE_MOCK_BROKER', 'false').lower() == 'true'
+        use_mock_broker = os.getenv("USE_MOCK_BROKER", "false").lower() == "true"
         kinesis_config = None
-        
+
         if not use_mock_broker:
-            kinesis_stream_name = os.getenv('KINESIS_STREAM_NAME', 'guardian-content')
+            kinesis_stream_name = os.getenv("KINESIS_STREAM_NAME", "guardian-content")
             kinesis_config = KinesisConfig(
-                stream_name=kinesis_stream_name,
-                aws_config=aws_config
+                stream_name=kinesis_stream_name, aws_config=aws_config
             )
-        
+
         # Load application settings
-        log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
-        if log_level not in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
+        log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+        if log_level not in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
             logger.warning(f"Invalid log level '{log_level}', using INFO")
-            log_level = 'INFO'
-        
+            log_level = "INFO"
+
         config = AppConfig(
             guardian_config=guardian_config,
             kinesis_config=kinesis_config,
             log_level=log_level,
-            use_mock_broker=use_mock_broker
+            use_mock_broker=use_mock_broker,
         )
-        
+
         logger.info("Configuration loaded successfully from environment variables")
         return config
-        
+
     except ConfigurationError:
         raise
     except Exception as e:
@@ -170,19 +175,19 @@ def load_config_from_env() -> AppConfig:
 def create_config_dict(
     guardian_api_key: str,
     kinesis_stream_name: Optional[str] = None,
-    aws_region: str = 'eu-west-2',
+    aws_region: str = "eu-west-2",
     aws_access_key_id: Optional[str] = None,
     aws_secret_access_key: Optional[str] = None,
     use_mock_broker: bool = False,
-    log_level: str = 'INFO'
+    log_level: str = "INFO",
 ) -> Dict[str, Any]:
     """
     Create a configuration dictionary from provided parameters.
-    
+
     This function is useful for programmatic configuration creation
     when environment variables are not available or when overriding
     specific settings.
-    
+
     Args:
         guardian_api_key (str): Guardian API key
         kinesis_stream_name (Optional[str]): Kinesis stream name
@@ -191,90 +196,91 @@ def create_config_dict(
         aws_secret_access_key (Optional[str]): AWS secret access key
         use_mock_broker (bool): Use mock broker (default: False)
         log_level (str): Logging level (default: INFO)
-        
+
     Returns:
         Dict[str, Any]: Configuration dictionary
-        
+
     Raises:
         ConfigurationError: If required parameters are missing
     """
     if not guardian_api_key:
         raise ConfigurationError("Guardian API key is required")
-    
+
     if not use_mock_broker and not kinesis_stream_name:
-        raise ConfigurationError("Kinesis stream name is required when not using mock broker")
-    
+        raise ConfigurationError(
+            "Kinesis stream name is required when not using mock broker"
+        )
+
     return {
-        'guardian_api_key': guardian_api_key,
-        'kinesis_stream_name': kinesis_stream_name,
-        'aws_region': aws_region,
-        'aws_access_key_id': aws_access_key_id,
-        'aws_secret_access_key': aws_secret_access_key,
-        'use_mock_broker': use_mock_broker,
-        'log_level': log_level
+        "guardian_api_key": guardian_api_key,
+        "kinesis_stream_name": kinesis_stream_name,
+        "aws_region": aws_region,
+        "aws_access_key_id": aws_access_key_id,
+        "aws_secret_access_key": aws_secret_access_key,
+        "use_mock_broker": use_mock_broker,
+        "log_level": log_level,
     }
 
 
-def setup_logging(log_level: str = 'INFO') -> None:
+def setup_logging(log_level: str = "INFO") -> None:
     """
     Configure application logging.
-    
+
     Args:
         log_level (str): Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     """
     import sys
-    
+
     # Convert string level to logging constant
     numeric_level = getattr(logging, log_level.upper(), logging.INFO)
-    
+
     # Configure root logger
     logging.basicConfig(
         level=numeric_level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.StreamHandler(sys.stdout)
-        ]
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[logging.StreamHandler(sys.stdout)],
     )
-    
+
     # Set specific loggers to appropriate levels
-    logging.getLogger('boto3').setLevel(logging.WARNING)
-    logging.getLogger('botocore').setLevel(logging.WARNING)
-    logging.getLogger('urllib3').setLevel(logging.WARNING)
-    
+    logging.getLogger("boto3").setLevel(logging.WARNING)
+    logging.getLogger("botocore").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+
     logger.info(f"Logging configured at {log_level} level")
 
 
 def validate_aws_credentials(aws_config: AWSConfig) -> bool:
     """
     Validate AWS credentials by attempting to create a client.
-    
+
     Args:
         aws_config (AWSConfig): AWS configuration to validate
-        
+
     Returns:
         bool: True if credentials are valid, False otherwise
     """
     try:
         import boto3
         from botocore.exceptions import NoCredentialsError, ClientError
-        
+
         # Try to create a client with the provided credentials
         if aws_config.access_key_id and aws_config.secret_access_key:
             client = boto3.client(
-                'sts',  # Use STS service for credential validation
+                "sts",  # Use STS service for credential validation
                 region_name=aws_config.region,
                 aws_access_key_id=aws_config.access_key_id,
-                aws_secret_access_key=aws_config.secret_access_key
+                aws_secret_access_key=aws_config.secret_access_key,
             )
         else:
             # Use default credential chain
-            client = boto3.client('sts', region_name=aws_config.region)
-        
+            client = boto3.client("sts", region_name=aws_config.region)
+
         # Test credentials by calling get_caller_identity
         response = client.get_caller_identity()
-        logger.info(f"AWS credentials validated for account: {response.get('Account', 'Unknown')}")
+        account = response.get("Account", "Unknown")
+        logger.info(f"AWS credentials validated for account: {account}")
         return True
-        
+
     except NoCredentialsError:
         logger.error("No AWS credentials found")
         return False
@@ -289,7 +295,7 @@ def validate_aws_credentials(aws_config: AWSConfig) -> bool:
 def print_config_template():
     """
     Print a template for environment variable configuration.
-    
+
     This function outputs a template that users can copy to create
     their .env file with all available configuration options.
     """
@@ -326,7 +332,7 @@ KINESIS_STREAM_NAME=guardian-content
     print(template.strip())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """
     When run as a script, print the configuration template.
     """

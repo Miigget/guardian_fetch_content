@@ -1,13 +1,15 @@
-# Development dependencies
+# Development dependencies (as required by task_description_pl.md)
+
+# Unit testing - REQUIRED
 pytest>=7.4.0
 pytest-cov>=4.1.0
+
+# PEP-8 compliance - REQUIRED
 black>=23.0.0
 flake8>=6.0.0
-mypy>=1.5.0
 
-# Security scanning
+# Security scanning - REQUIRED
 bandit>=1.7.0
-safety>=2.3.0
 
-# Documentation
+# Documentation (optional, but good practice)
 sphinx>=7.0.0
