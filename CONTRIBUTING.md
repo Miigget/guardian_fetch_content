@@ -27,7 +27,7 @@ pip install -r requirements.txt
 pip install -e .
 
 # Install development dependencies
-pip install pytest pytest-cov black flake8 mypy bandit safety sphinx
+pip install -r requirements-dev.txt
 
 # Set up environment variables
 cp env_template.txt .env
@@ -38,13 +38,13 @@ cp env_template.txt .env
 
 ```bash
 # Run all quality checks
-python run_tests.py
+python scripts/run_tests.py
 
 # Run specific checks
-python run_tests.py --tests-only      # Unit tests only
-python run_tests.py --lint-only       # Code style checks
-python run_tests.py --security-only   # Security scans
-python run_tests.py --verbose         # Verbose output
+python scripts/run_tests.py --tests-only      # Unit tests only
+python scripts/run_tests.py --lint-only       # Code style checks
+python scripts/run_tests.py --security-only   # Security scans
+python scripts/run_tests.py --verbose         # Verbose output
 ```
 
 ## 📝 Code Standards
@@ -182,7 +182,7 @@ For feature requests, please provide:
 
 3. **Run Quality Checks**:
    ```bash
-   python run_tests.py
+   python scripts/run_tests.py
    ```
 
 4. **Commit Your Changes**:

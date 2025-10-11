@@ -69,10 +69,10 @@ black src/guardian_content_fetcher/api_client.py
 ### Run all quality checks
 ```bash
 # All code quality tests
-python run_tests.py
+python scripts/run_tests.py
 
 # Linting only
-python run_tests.py --lint-only
+python scripts/run_tests.py --lint-only
 ```
 
 ## Switching to 79 Characters (Strict PEP-8)

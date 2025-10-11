@@ -151,7 +151,7 @@ echo "GUARDIAN_RATE_LIMIT_DELAY=3.0" >> .env
 
 ```bash
 # Run all tests to verify everything works
-python run_tests.py --tests-only
+python scripts/run_tests.py --tests-only
 
 # Quick functionality test
 guardian-fetch "test" --use-mock --max-articles 1

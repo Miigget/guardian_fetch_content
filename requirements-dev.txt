@@ -11,5 +11,3 @@ flake8>=6.0.0
 # Security scanning - REQUIRED
 bandit>=1.7.0
 
-# Documentation (optional, but good practice)
-sphinx>=7.0.0

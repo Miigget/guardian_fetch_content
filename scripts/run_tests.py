@@ -205,10 +205,11 @@ Examples:
     
     args = parser.parse_args()
     
-    # Ensure we're in the right directory
-    project_root = Path(__file__).parent
-    if project_root.name != "guardian_fetch_content":
+    # Ensure we're in the right directory (check for setup.py)
+    project_root = Path(__file__).parent.parent
+    if not (project_root / "setup.py").exists():
         print("❌ Error: This script must be run from the project root directory")
+        print(f"   Looking for setup.py in: {project_root}")
         return 1
     
     success = True

@@ -17,7 +17,7 @@ This project includes an automated build script to handle this for you.
 From the project's root directory, simply run:
 
 ```bash
-python build_lambda_package.py
+python scripts/build_lambda_package.py
 ```
 
 This script will:

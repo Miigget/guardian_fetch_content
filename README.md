@@ -221,13 +221,15 @@ guardian_fetch_content/
 │   ├── test_content_fetcher.py # Main class tests
 │   ├── test_config.py          # Configuration tests
 │   └── test_cli.py             # CLI tests
+├── scripts/                    # Helper scripts
+│   ├── run_tests.py           # Test runner script
+│   └── build_lambda_package.py # Lambda deployment packager
 ├── requirements.txt             # Python dependencies
 ├── requirements-dev.txt         # Development dependencies
 ├── setup.py                     # Package configuration
-├── pyproject.toml              # Black, pytest, mypy configuration
+├── pyproject.toml              # Black and pytest configuration
 ├── .flake8                     # Flake8 linting configuration (88 chars)
-├── pytest.ini                  # Test configuration (legacy)
-├── run_tests.py                 # Test runner script
+├── pytest.ini                  # Test configuration
 ├── env_template.txt             # Environment configuration template
 ├── README.md                    # This file
 ├── CONTRIBUTING.md              # Contribution guidelines
@@ -240,13 +242,13 @@ The project includes comprehensive tests with 90%+ coverage:
 
 ```bash
 # Run all tests with coverage
-python run_tests.py
+python scripts/run_tests.py
 
 # Run only unit tests
-python run_tests.py --tests-only
+python scripts/run_tests.py --tests-only
 
 # Run with verbose output
-python run_tests.py --verbose
+python scripts/run_tests.py --verbose
 
 # Run specific test categories
 python -m pytest tests/ -v
@@ -257,12 +259,12 @@ python -m pytest tests/test_api_client.py -v
 
 ```bash
 # Run all quality checks (unit tests, PEP-8, security)
-python run_tests.py
+python scripts/run_tests.py
 
 # Individual checks
-python run_tests.py --tests-only    # Unit tests only
-python run_tests.py --lint-only     # Code style (flake8, black)
-python run_tests.py --security-only # Security (bandit)
+python scripts/run_tests.py --tests-only    # Unit tests only
+python scripts/run_tests.py --lint-only     # Code style (flake8, black)
+python scripts/run_tests.py --security-only # Security (bandit)
 ```
 
 ## 🏗 Architecture
@@ -414,7 +416,7 @@ See detailed instructions in [CODE_STYLE.md](CODE_STYLE.md) or [CONTRIBUTING.md]
 1. Fork the repository
 2. Create a feature branch
 3. Make changes with tests
-4. Run quality checks: `python run_tests.py`
+4. Run quality checks: `python scripts/run_tests.py`
 5. Submit a pull request
 
 ## 📚 API Reference
