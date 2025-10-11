@@ -7,6 +7,12 @@ __pycache__/
 *$py.class
 *.so
 
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+*.egg
+
 # Testing and Coverage
 .pytest_cache/
 .coverage
