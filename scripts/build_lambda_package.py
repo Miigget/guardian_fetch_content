@@ -19,8 +19,8 @@ import sys
 from pathlib import Path
 
 # --- Configuration ---
-# Project root directory
-ROOT_DIR = Path(__file__).parent.resolve()
+# Project root directory (parent of scripts/ folder)
+ROOT_DIR = Path(__file__).parent.parent.resolve()
 
 # Source code directory
 SRC_DIR = ROOT_DIR / "src" / "guardian_content_fetcher"
