@@ -54,7 +54,7 @@ def handler(event: Dict[str, Any], context: object) -> Dict[str, Any]:
         # --- 2. Load Configuration from Environment Variables ---
         guardian_api_key = os.environ.get("GUARDIAN_API_KEY")
         kinesis_stream_name = os.environ.get("KINESIS_STREAM_NAME")
-        aws_region = os.environ.get("AWS_DEFAULT_REGION", "us-east-1")
+        aws_region = os.environ.get("AWS_DEFAULT_REGION", "eu-west-2")
 
         if not guardian_api_key or not kinesis_stream_name:
             raise EnvironmentError(

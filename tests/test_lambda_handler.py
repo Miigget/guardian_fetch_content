@@ -186,7 +186,7 @@ class TestLambdaHandler:
         call_args = mock_factory.create_with_kinesis.call_args
         assert call_args.kwargs["guardian_api_key"] == "test-key"
         assert call_args.kwargs["kinesis_stream_name"] == "test-stream"
-        assert call_args.kwargs["aws_region"] == "us-east-1"
+        assert call_args.kwargs["aws_region"] == "eu-west-2"
 
     @patch("guardian_content_fetcher.lambda_handler.GuardianContentFetcherFactory")
     @patch.dict(
