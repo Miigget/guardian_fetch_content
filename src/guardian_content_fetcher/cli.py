@@ -164,7 +164,7 @@ def load_configuration(args: argparse.Namespace) -> Dict[str, Any]:
 
     # AWS configuration
     config["aws_region"] = args.aws_region or os.getenv(
-        "AWS_DEFAULT_REGION", "us-east-1"
+        "AWS_DEFAULT_REGION", "eu-west-2"
     )
     config["aws_access_key_id"] = os.getenv("AWS_ACCESS_KEY_ID")
     config["aws_secret_access_key"] = os.getenv("AWS_SECRET_ACCESS_KEY")
@@ -339,6 +339,11 @@ def main() -> int:
     Returns:
         int: Exit code (0 for success, 1 for failure)
     """
+    # Check if no arguments provided - run interactive mode
+    if len(sys.argv) == 1:
+        run_interactive_mode()
+        return 0
+
     try:
         # Parse command line arguments
         parser = setup_argument_parser()
@@ -382,12 +387,15 @@ def main() -> int:
         return 1
 
 
-def run_interactive_mode():
+def run_interactive_mode() -> int:
     """
     Run the CLI in interactive mode for easier testing and development.
 
     This function provides a simplified interface for users who prefer
     interactive prompts over command line arguments.
+
+    Returns:
+        int: Exit code (0 for success, 1 for failure)
     """
     print("Guardian Content Fetcher - Interactive Mode")
     print("==========================================")
@@ -397,12 +405,12 @@ def run_interactive_mode():
         search_term = input("Enter search term: ").strip()
         if not search_term:
             print("Error: Search term cannot be empty")
-            return
+            return 1
 
         date_from = input("Enter date filter (YYYY-MM-DD, optional): ").strip()
         if date_from and len(date_from) != 10:
             print("Error: Date must be in YYYY-MM-DD format")
-            return
+            return 1
 
         max_articles = input("Maximum articles (1-50, default 10): ").strip()
         if max_articles:
@@ -410,7 +418,7 @@ def run_interactive_mode():
                 max_articles = int(max_articles)
             except ValueError:
                 print("Error: Maximum articles must be a number")
-                return
+                return 1
         else:
             max_articles = 10
 
@@ -440,17 +448,19 @@ def run_interactive_mode():
         output = format_output(result, "text")
         print("\n" + output)
 
+        # Return success/failure based on result
+        return 0 if result["success"] else 1
+
     except CLIError as e:
         print(f"Error: {e}")
+        return 1
     except KeyboardInterrupt:
         print("\nOperation cancelled")
+        return 1
     except Exception as e:
         print(f"Unexpected error: {e}")
+        return 1
 
 
 if __name__ == "__main__":
-    # If no arguments provided, run in interactive mode
-    if len(sys.argv) == 1:
-        run_interactive_mode()
-    else:
-        sys.exit(main())
+    sys.exit(main())

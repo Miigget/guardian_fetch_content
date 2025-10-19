@@ -62,9 +62,6 @@ def handler(event: Dict[str, Any], context: object) -> Dict[str, Any]:
                 "and KINESIS_STREAM_NAME must be set."
             )
 
-        # AWS credentials (access key, secret key) are typically handled by
-        # the Lambda execution role. We don't need to load them manually here.
-
         # --- 3. Execute the Fetch and Publish Logic ---
         logger.info(
             f"Initializing fetcher for Kinesis stream "

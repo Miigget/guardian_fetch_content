@@ -16,7 +16,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 setup(
     name="guardian-content-fetcher",
     version="1.0.0",
-    author="Northcoders Data Engineering Team",
+    author="Marcin Sodel",
     description="A tool to fetch Guardian articles and publish to message brokers",
     long_description=long_description,
     long_description_content_type="text/markdown",
