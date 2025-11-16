@@ -4,8 +4,8 @@ Get up and running with Guardian Content Fetcher in under 5 minutes! 🚀
 
 ## Prerequisites Checklist
 
-- [ ] Python 3.8+ installed
-- [ ] Guardian API key (free)
+- [ ] Python 3.8+ installed ([download](https://www.python.org/downloads/))
+- [ ] Guardian API key (free) ([get one](https://open-platform.theguardian.com/access/))
 - [ ] AWS account (optional, for Kinesis)
 
 ## Step 1: Get Guardian API Key (2 minutes)
@@ -19,7 +19,7 @@ Get up and running with Guardian Content Fetcher in under 5 minutes! 🚀
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/Miigget/guardian_fetch_content
 cd guardian_fetch_content
 
 # Install dependencies
@@ -32,15 +32,32 @@ pip install -r requirements-dev.txt
 pip install -e .
 ```
 
-## Step 3: Configure Environment (1 minute)
+### Verify your setup (quick checks)
+
+> ℹ️ Before running the checks, make sure the developer dependencies are installed (production `requirements.txt` alone does not include the tooling needed by `scripts/run_tests.py`):
+>
 
 ```bash
-# Copy the template
-cp env_template.txt .env
+# Full quality gate (install, tests+coverage, lint, security)
+python scripts/run_tests.py
 
-# Edit with your API key
-echo "GUARDIAN_API_KEY=your-actual-api-key-here" > .env
+# Or a minimal smoke test with the mock broker
+guardian-fetch "test" --use-mock --max-articles 1 --verbose
 ```
+
+## Step 3: Configure Environment (1 minute)
+
+Copy the template to create your local `.env`:
+```bash
+cp env_template.txt .env
+```
+
+Open `.env` in your editor and set:
+```
+GUARDIAN_API_KEY=your-actual-api-key-here
+```
+
+> ℹ️ Tip for development: when using the mock broker, you can set `GUARDIAN_API_KEY=test`. Replace it with your real key in production.
 
 ## Step 4: Test with Mock Broker (30 seconds)
 
@@ -60,9 +77,9 @@ Articles published: 10
 Success: Yes
 ```
 
-## Step 5: Set Up AWS Kinesis (Optional, 2 minutes)
+## Step 5: Set Up AWS Kinesis for CLI Usage (Optional, 2 minutes)
 
-If you want to use real AWS Kinesis:
+If you want to use real AWS Kinesis via CLI:
 
 ```bash
 # Add AWS credentials to .env
@@ -148,6 +165,7 @@ echo "GUARDIAN_RATE_LIMIT_DELAY=3.0" >> .env
 ```
 
 ### Test Your Setup
+> Prefer the “Verify your setup (quick checks)” under Step 2 above. The commands below are equivalent and kept for reference.
 
 > ℹ️ Before running the checks, make sure the developer dependencies are installed (production `requirements.txt` alone does not include the tooling needed by `scripts/run_tests.py`):
 >
@@ -211,6 +229,9 @@ KINESIS_STREAM_NAME=guardian-content
 LOG_LEVEL=INFO
 ```
 
+Notes:
+- Local/EC2/containers: set `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` here or rely on the instance profile/credential provider chain.
+- AWS Lambda: do not put static access keys in `.env`. Use the function’s IAM role for AWS credentials. Only set non-secret variables like `KINESIS_STREAM_NAME` and `LOG_LEVEL`. Leave `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` unset.
 ## Success! 🎉
 
 You're now ready to fetch Guardian articles and publish them to message brokers. 
