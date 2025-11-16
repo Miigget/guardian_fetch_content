@@ -21,8 +21,7 @@ How it works, step by step:
 
 ## 🚀 Quick Start
 
-For a step-by-step, friendly onboarding (prerequisites, installation,
-environment setup, sample commands, troubleshooting), open the dedicated
+For a step-by-step setup, open the dedicated
 [`QUICKSTART.md`](./QUICKSTART.md). That document is the canonical source for:
 
 - Installing and testing the project locally.
@@ -48,20 +47,10 @@ reference information you may need after the initial setup.
 - ✅ **Type Hints**: Full type annotations for better code clarity
 - ✅ **Code Quality**: PEP-8 compliance, security scanning with Bandit
 
-## 🛠 Installation & Setup
-
-- **Need a guided walkthrough?** Follow the instructions in [`QUICKSTART.md`](./QUICKSTART.md) for
-  cloning the repo, installing dependencies, configuring `.env`, and running smoke tests.
-- **Environment variables.** Copy `env_template.txt` to `.env`, then fill in your Guardian API key
-  and (optionally) AWS credentials. Quickstart explains every field in plain language.
-- **Prerequisites recap.** Python 3.8+, a Guardian API key, and AWS credentials only if you plan to
-  push data to Kinesis. Mock mode works without AWS access.
-
 ## ⚙️ Configuration
 
 The application is configured entirely through environment variables. `env_template.txt` and the
-Quick Start Guide explain each field in detail; the snippets below highlight the most important
-values so you can quickly see what's available.
+[`QUICKSTART.md`](./QUICKSTART.md) explain each field in detail, the snippets below highlight the most important values so you can quickly see what's available.
 
 ### Required Configuration
 
@@ -118,17 +107,68 @@ guardian-fetch "cloud computing" --output-format json
 guardian-fetch "machine learning" --use-mock --verbose
 ```
 
-Interactive mode - runs a guided prompt that asks for the key options:
+**Interactive mode** - runs a guided prompt that asks for the key options:
 
 ```bash
 guardian-fetch
 ```
 
+```bash
+# Example:
+Guardian Content Fetcher - Interactive Mode
+==========================================
+Enter search term: AI
+Enter date filter (YYYY-MM-DD, optional): 2025-11-01
+Maximum articles (1-50, default 10): 1
+Use mock publisher? (y/N): y
+```
+
 ### AWS Lambda
 
 Use the project as a serverless function for scheduled or event-driven runs. The function loads
-configuration from environment variables and publishes to AWS Kinesis. See the full guide:
+configuration from AWS Lambda environment variables and publishes to AWS Kinesis. See the full guide:
 [`DEPLOY_LAMBDA.md`](./DEPLOY_LAMBDA.md).
+
+```python
+# Lambda handler example (see lambda_handler.py for the actual implementation)
+import json
+from guardian_content_fetcher import (
+    load_config_from_env,
+    GuardianContentFetcherFactory,
+)
+
+def lambda_handler(event, context):
+    # Load configuration from environment variables using config module
+    config = load_config_from_env()
+    
+    # Validate Kinesis config is available (Lambda requires real broker)
+    if not config.kinesis_config:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({
+                'error': 'Kinesis configuration required. Set KINESIS_STREAM_NAME.'
+            })
+        }
+    
+    # Create fetcher and execute
+    fetcher = GuardianContentFetcherFactory.create_with_kinesis(
+        guardian_api_key=config.guardian_config.api_key,
+        kinesis_stream_name=config.kinesis_config.stream_name,
+        aws_region=config.kinesis_config.aws_config.region,
+    )
+    
+    with fetcher:
+        result = fetcher.fetch_and_publish(
+            search_term=event['search_term'],
+            date_from=event.get('date_from'),
+            max_articles=event.get('max_articles', 10)
+        )
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps(result)
+    }
+```
 
 ### Manual wiring (Python)
 
@@ -249,56 +289,7 @@ Articles published: 10
 Success: Yes
 ```
 
-## 🚀 Deployment
-
-### AWS Lambda
-
-The package is designed to work within AWS Lambda memory limits. For a full, click-by-click
-deployment walkthrough (packaging, IAM role, environment variables, and testing in the AWS
-console), see the dedicated guide: [`DEPLOY_LAMBDA.md`](./DEPLOY_LAMBDA.md).
-
-```python
-# Lambda handler example (see lambda_handler.py for the actual implementation)
-import json
-from guardian_content_fetcher import (
-    load_config_from_env,
-    GuardianContentFetcherFactory,
-)
-
-def lambda_handler(event, context):
-    # Load configuration from environment variables using config module
-    config = load_config_from_env()
-    
-    # Validate Kinesis config is available (Lambda requires real broker)
-    if not config.kinesis_config:
-        return {
-            'statusCode': 400,
-            'body': json.dumps({
-                'error': 'Kinesis configuration required. Set KINESIS_STREAM_NAME.'
-            })
-        }
-    
-    # Create fetcher and execute
-    fetcher = GuardianContentFetcherFactory.create_with_kinesis(
-        guardian_api_key=config.guardian_config.api_key,
-        kinesis_stream_name=config.kinesis_config.stream_name,
-        aws_region=config.kinesis_config.aws_config.region,
-    )
-    
-    with fetcher:
-        result = fetcher.fetch_and_publish(
-            search_term=event['search_term'],
-            date_from=event.get('date_from'),
-            max_articles=event.get('max_articles', 10)
-        )
-    
-    return {
-        'statusCode': 200,
-        'body': json.dumps(result)
-    }
-```
-
-### Docker
+## 🚀 Docker
 
 ```dockerfile
 FROM python:3.9-slim
