@@ -164,7 +164,7 @@ def load_configuration(args: argparse.Namespace) -> Dict[str, Any]:
     aws_access_key_id = None
     aws_secret_access_key = None
     kinesis_stream_name = "guardian-content"
-    
+
     if app_config.kinesis_config:
         aws_region = app_config.kinesis_config.aws_config.region
         aws_access_key_id = app_config.kinesis_config.aws_config.access_key_id

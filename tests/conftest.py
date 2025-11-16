@@ -12,7 +12,12 @@ from typing import Dict, Any, Optional
 from guardian_content_fetcher.api_client import GuardianAPIClient
 from guardian_content_fetcher.message_broker import MockPublisher, KinesisPublisher
 from guardian_content_fetcher.content_fetcher import GuardianContentFetcher
-from guardian_content_fetcher.config import AppConfig, GuardianConfig, KinesisConfig, AWSConfig
+from guardian_content_fetcher.config import (
+    AppConfig,
+    GuardianConfig,
+    KinesisConfig,
+    AWSConfig,
+)
 
 
 @pytest.fixture
@@ -369,20 +374,19 @@ def assert_valid_result_format(result: Dict[str, Any]):
 def mock_app_config():
     """
     Mock AppConfig for Lambda handler tests.
-    
+
     Provides a default valid configuration that can be customized via parameters.
     Most tests use this standard configuration, but it can be overridden for
     special cases (e.g., missing Kinesis config, different regions).
-    
+
     Returns:
         AppConfig: Default mock application configuration
     """
     return AppConfig(
         guardian_config=GuardianConfig(api_key="test-key"),
         kinesis_config=KinesisConfig(
-            stream_name="test-stream",
-            aws_config=AWSConfig(region="eu-west-2")
-        )
+            stream_name="test-stream", aws_config=AWSConfig(region="eu-west-2")
+        ),
     )
 
 
@@ -390,45 +394,45 @@ def mock_app_config():
 def create_mock_config():
     """
     Factory fixture to create custom AppConfig instances for tests.
-    
+
     This allows tests to easily create configs with different parameters
     without duplicating the AppConfig construction code.
-    
+
     Returns:
         function: Factory function to create AppConfig instances
     """
+
     def _create_config(
         api_key: str = "test-key",
         stream_name: str = "test-stream",
         region: str = "eu-west-2",
         kinesis_config: Optional[KinesisConfig] = None,
-        use_mock_broker: bool = False
+        use_mock_broker: bool = False,
     ) -> AppConfig:
         """
         Create an AppConfig instance with specified parameters.
-        
+
         Args:
             api_key: Guardian API key
             stream_name: Kinesis stream name
             region: AWS region
             kinesis_config: Optional KinesisConfig (if None, creates one)
             use_mock_broker: Whether to use mock broker
-            
+
         Returns:
             AppConfig: Configured AppConfig instance
         """
         guardian_config = GuardianConfig(api_key=api_key)
-        
+
         if kinesis_config is None and not use_mock_broker:
             kinesis_config = KinesisConfig(
-                stream_name=stream_name,
-                aws_config=AWSConfig(region=region)
+                stream_name=stream_name, aws_config=AWSConfig(region=region)
             )
-        
+
         return AppConfig(
             guardian_config=guardian_config,
             kinesis_config=kinesis_config,
-            use_mock_broker=use_mock_broker
+            use_mock_broker=use_mock_broker,
         )
-    
+
     return _create_config

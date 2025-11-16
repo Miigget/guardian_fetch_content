@@ -53,21 +53,21 @@ def run_linting():
     """Run code linting checks."""
     success = True
     
-    # Flake8 for style checking (PEP-8 compliance)
-    print("\n🔍 Running Flake8 style checks...")
-    flake8_result = run_command(
-        ["python", "-m", "flake8", "src/", "tests/"],
-        "Checking code style with Flake8"
-    )
-    success = success and flake8_result
-    
-    # Black for code formatting check
+    # Black for code formatting check (idempotent formatter)
     print("\n🔍 Running Black format checks...")
     black_result = run_command(
         ["python", "-m", "black", "--check", "src/", "tests/"],
         "Checking code formatting with Black"
     )
     success = success and black_result
+    
+    # Flake8 for style checking (PEP-8 compliance, incl. line length)
+    print("\n🔍 Running Flake8 style checks...")
+    flake8_result = run_command(
+        ["python", "-m", "flake8", "src/", "tests/"],
+        "Checking code style with Flake8"
+    )
+    success = success and flake8_result
     
     return success
 

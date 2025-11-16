@@ -21,7 +21,7 @@ class TestLambdaHandler:
         # Setup mock config with custom region
         mock_config = create_mock_config(api_key="test-api-key", region="us-east-1")
         mock_load_config.return_value = mock_config
-        
+
         # Setup mock fetcher
         mock_fetcher = MagicMock()
         mock_fetcher.__enter__ = Mock(return_value=mock_fetcher)
@@ -54,8 +54,6 @@ class TestLambdaHandler:
             guardian_api_key="test-api-key",
             kinesis_stream_name="test-stream",
             aws_region="us-east-1",
-            aws_access_key_id=None,
-            aws_secret_access_key=None,
         )
 
         # Verify fetch_and_publish was called
@@ -65,12 +63,14 @@ class TestLambdaHandler:
 
     @patch("guardian_content_fetcher.lambda_handler.GuardianContentFetcherFactory")
     @patch("guardian_content_fetcher.lambda_handler.load_config_from_env")
-    def test_handler_with_date_filter(self, mock_load_config, mock_factory, create_mock_config):
+    def test_handler_with_date_filter(
+        self, mock_load_config, mock_factory, create_mock_config
+    ):
         """Test handler with date filter parameter."""
         # Setup mock config with custom region
         mock_config = create_mock_config(api_key="test-api-key", region="eu-west-1")
         mock_load_config.return_value = mock_config
-        
+
         # Setup mock fetcher
         mock_fetcher = MagicMock()
         mock_fetcher.__enter__ = Mock(return_value=mock_fetcher)
@@ -120,11 +120,11 @@ class TestLambdaHandler:
     def test_handler_missing_api_key(self, mock_load_config):
         """Test handler with missing GUARDIAN_API_KEY environment variable."""
         from guardian_content_fetcher.config import ConfigurationError
-        
+
         mock_load_config.side_effect = ConfigurationError(
             "GUARDIAN_API_KEY environment variable is required."
         )
-        
+
         event = {"search_term": "test"}
 
         response = handler(event, None)
@@ -140,7 +140,7 @@ class TestLambdaHandler:
         # Config with use_mock_broker=True means kinesis_config is None
         mock_config = create_mock_config(use_mock_broker=True, kinesis_config=None)
         mock_load_config.return_value = mock_config
-        
+
         event = {"search_term": "test"}
 
         response = handler(event, None)
@@ -152,7 +152,9 @@ class TestLambdaHandler:
 
     @patch("guardian_content_fetcher.lambda_handler.GuardianContentFetcherFactory")
     @patch("guardian_content_fetcher.lambda_handler.load_config_from_env")
-    def test_handler_default_region(self, mock_load_config, mock_factory, mock_app_config):
+    def test_handler_default_region(
+        self, mock_load_config, mock_factory, mock_app_config
+    ):
         """Test handler uses default AWS region when not specified."""
         # Use default config fixture (eu-west-2 is the default)
         mock_load_config.return_value = mock_app_config
@@ -182,10 +184,12 @@ class TestLambdaHandler:
 
     @patch("guardian_content_fetcher.lambda_handler.GuardianContentFetcherFactory")
     @patch("guardian_content_fetcher.lambda_handler.load_config_from_env")
-    def test_handler_default_max_articles(self, mock_load_config, mock_factory, mock_app_config):
+    def test_handler_default_max_articles(
+        self, mock_load_config, mock_factory, mock_app_config
+    ):
         """Test handler uses default max_articles when not specified."""
         mock_load_config.return_value = mock_app_config
-        
+
         mock_fetcher = MagicMock()
         mock_fetcher.__enter__ = Mock(return_value=mock_fetcher)
         mock_fetcher.__exit__ = Mock(return_value=None)
@@ -210,10 +214,12 @@ class TestLambdaHandler:
 
     @patch("guardian_content_fetcher.lambda_handler.GuardianContentFetcherFactory")
     @patch("guardian_content_fetcher.lambda_handler.load_config_from_env")
-    def test_handler_fetcher_error(self, mock_load_config, mock_factory, mock_app_config):
+    def test_handler_fetcher_error(
+        self, mock_load_config, mock_factory, mock_app_config
+    ):
         """Test handler handles GuardianContentFetcherError."""
         mock_load_config.return_value = mock_app_config
-        
+
         from guardian_content_fetcher.content_fetcher import (
             GuardianContentFetcherError,
         )
@@ -237,10 +243,12 @@ class TestLambdaHandler:
 
     @patch("guardian_content_fetcher.lambda_handler.GuardianContentFetcherFactory")
     @patch("guardian_content_fetcher.lambda_handler.load_config_from_env")
-    def test_handler_unexpected_error(self, mock_load_config, mock_factory, mock_app_config):
+    def test_handler_unexpected_error(
+        self, mock_load_config, mock_factory, mock_app_config
+    ):
         """Test handler handles unexpected exceptions."""
         mock_load_config.return_value = mock_app_config
-        
+
         mock_fetcher = MagicMock()
         mock_fetcher.__enter__ = Mock(return_value=mock_fetcher)
         mock_fetcher.__exit__ = Mock(return_value=None)
@@ -258,10 +266,12 @@ class TestLambdaHandler:
 
     @patch("guardian_content_fetcher.lambda_handler.GuardianContentFetcherFactory")
     @patch("guardian_content_fetcher.lambda_handler.load_config_from_env")
-    def test_handler_invalid_max_articles(self, mock_load_config, mock_factory, mock_app_config):
+    def test_handler_invalid_max_articles(
+        self, mock_load_config, mock_factory, mock_app_config
+    ):
         """Test handler with invalid max_articles value."""
         mock_load_config.return_value = mock_app_config
-        
+
         event = {"search_term": "test", "max_articles": "invalid"}
 
         response = handler(event, None)
@@ -273,10 +283,12 @@ class TestLambdaHandler:
 
     @patch("guardian_content_fetcher.lambda_handler.GuardianContentFetcherFactory")
     @patch("guardian_content_fetcher.lambda_handler.load_config_from_env")
-    def test_handler_context_manager_cleanup(self, mock_load_config, mock_factory, mock_app_config):
+    def test_handler_context_manager_cleanup(
+        self, mock_load_config, mock_factory, mock_app_config
+    ):
         """Test that handler properly uses context manager for cleanup."""
         mock_load_config.return_value = mock_app_config
-        
+
         mock_fetcher = MagicMock()
         mock_enter = Mock(return_value=mock_fetcher)
         mock_exit = Mock(return_value=None)
@@ -302,10 +314,12 @@ class TestLambdaHandler:
 
     @patch("guardian_content_fetcher.lambda_handler.GuardianContentFetcherFactory")
     @patch("guardian_content_fetcher.lambda_handler.load_config_from_env")
-    def test_handler_partial_success(self, mock_load_config, mock_factory, mock_app_config):
+    def test_handler_partial_success(
+        self, mock_load_config, mock_factory, mock_app_config
+    ):
         """Test handler with partial success result."""
         mock_load_config.return_value = mock_app_config
-        
+
         mock_fetcher = MagicMock()
         mock_fetcher.__enter__ = Mock(return_value=mock_fetcher)
         mock_fetcher.__exit__ = Mock(return_value=None)

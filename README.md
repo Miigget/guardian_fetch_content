@@ -221,7 +221,6 @@ import json
 from guardian_content_fetcher import (
     load_config_from_env,
     GuardianContentFetcherFactory,
-    ConfigurationError
 )
 
 def lambda_handler(event, context):
@@ -242,8 +241,6 @@ def lambda_handler(event, context):
         guardian_api_key=config.guardian_config.api_key,
         kinesis_stream_name=config.kinesis_config.stream_name,
         aws_region=config.kinesis_config.aws_config.region,
-        aws_access_key_id=config.kinesis_config.aws_config.access_key_id,
-        aws_secret_access_key=config.kinesis_config.aws_config.secret_access_key,
     )
     
     with fetcher:
