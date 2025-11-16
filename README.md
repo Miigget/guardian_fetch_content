@@ -6,13 +6,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-## Overview
+## 📝 Overview
 
 This tool automatically finds recent news articles from The Guardian about topics you care about and sends them to where you need them (for example, to a data pipeline or a safe “mock” mode for testing). It helps teams stay on top of relevant news without manual searching or copy‑pasting.
 
 How it works, step by step:
 1. You choose a topic (e.g., “machine learning”) and optional filters (like a start date or number of articles).
-2. The app connects to The Guardian Open Platform using your API key (or a test placeholder in mock mode).
+2. The app connects to The Guardian Open Platform using your Guardian API key.
 3. It fetches matching articles and extracts key fields (title, URL, publish date, optional content preview).
 4. The articles are delivered to your chosen destination:
    - AWS Kinesis Data Streams for production pipelines, or
@@ -97,11 +97,42 @@ GUARDIAN_RATE_LIMIT_DELAY=2.0
 
 ## 📖 Usage
 
-- **Need CLI or basic Python examples?** Use the scenarios documented in
-  [`QUICKSTART.md`](./QUICKSTART.md); they cover searches, mock mode, JSON output, and interactive
-  runs.
-- **Prefer to wire components manually?** The advanced pattern below shows how to assemble the core
-  classes yourself.
+### CLI
+
+Common commands:
+
+```bash
+# Simple search
+guardian-fetch "artificial intelligence"
+
+# With date filter
+guardian-fetch "python programming" --date-from 2023-01-01
+
+# Limit number of articles
+guardian-fetch "data science" --max-articles 5
+
+# JSON output
+guardian-fetch "cloud computing" --output-format json
+
+# Mock mode (no AWS required; works with GUARDIAN_API_KEY=test)
+guardian-fetch "machine learning" --use-mock --verbose
+```
+
+Interactive mode - runs a guided prompt that asks for the key options:
+
+```bash
+guardian-fetch
+```
+
+### AWS Lambda
+
+Use the project as a serverless function for scheduled or event-driven runs. The function loads
+configuration from environment variables and publishes to AWS Kinesis. See the full guide:
+[`DEPLOY_LAMBDA.md`](./DEPLOY_LAMBDA.md).
+
+### Manual wiring (Python)
+
+Prefer to assemble components yourself in Python code? The pattern below shows how:
 
 ```python
 from guardian_content_fetcher import (
@@ -164,7 +195,7 @@ guardian_fetch_content/
 
 - `python scripts/run_tests.py` runs the entire quality gate (package install check, unit tests with
   coverage, linting, and security scan).
-- Quickstart documents every flag (`--tests-only`, `--lint-only`, `--security-only`, `--install-only`,
+- [`QUICKSTART.md`](./QUICKSTART.md) documents every flag (`--tests-only`, `--lint-only`, `--security-only`, `--install-only`,
   `--coverage`, `-v`) plus troubleshooting steps if any tool fails.
 - Prefer raw `pytest` or `flake8` commands? Feel free to call them directly—`scripts/run_tests.py`
   simply orchestrates the required checks described in `task_description_pl.md`.
@@ -305,37 +336,9 @@ As required by project specification:
 - **Documentation**: Comprehensive docstrings and comments
 - **Style**: Black formatting (88 char), Flake8 linting (88 char) - PEP-8 compliant
 
-**To switch to strict PEP-8 (79 characters):**
+To switch to strict PEP-8 (79 characters):
 
-See detailed instructions in [CODE_STYLE.md](CODE_STYLE.md)
-
-## 📚 API Reference
-
-### GuardianContentFetcher
-
-Main orchestrator class for the entire workflow.
-
-#### Methods
-
-- `fetch_and_publish(search_term, date_from=None, max_articles=10)`: Main operation
-- `close()`: Clean up resources
-
-### GuardianAPIClient
-
-Interface to Guardian Open Platform API.
-
-#### Methods
-
-- `search_content(search_term, date_from=None, page_size=10)`: Search for articles
-
-### MessageBrokerPublisher
-
-Abstract base class for message broker implementations.
-
-#### Methods
-
-- `publish_message(message)`: Publish single message
-- `publish_batch(messages)`: Publish multiple messages
+- see detailed instructions in [CODE_STYLE.md](CODE_STYLE.md)
 
 ## 🤝 Support
 
