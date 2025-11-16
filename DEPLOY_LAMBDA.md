@@ -2,12 +2,6 @@
 
 This guide provides step-by-step instructions for deploying the Guardian Content Fetcher as a serverless function on AWS Lambda. This is useful for scheduling regular fetches, for example, using Amazon EventBridge to trigger the function on a schedule.
 
-## Prerequisites
-
-- AWS Account and AWS CLI configured.
-- The application package installed (`pip install -e .`).
-- A Kinesis stream created (see `QUICKSTART.md`).
-
 ## Step 1: Package the Application
 
 To deploy to Lambda, you need to create a ZIP file containing the application code and its optimized dependencies. The AWS Lambda Python runtime already includes the `boto3` library, so we must exclude it from our package to keep the size small.
@@ -81,4 +75,4 @@ You can test your function directly from the AWS console to ensure it's working 
     ```
 4.  Click **Save**, then click the **Test** button.
 
-You should see an execution result with a `statusCode: 200`. You can inspect the detailed logs in the **Monitor** > **Logs** tab (which will take you to CloudWatch) and verify that new data has appeared in your Kinesis stream using the "Trim horizon" method described in the quick start guide.
+You should see an execution result with a `statusCode: 200`. You can inspect the detailed logs in the **Monitor** > **Logs** tab (which will take you to CloudWatch) and verify that new data has appeared in your Kinesis stream using the "Trim horizon" method.
