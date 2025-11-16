@@ -6,6 +6,19 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+## Overview
+
+This tool automatically finds recent news articles from The Guardian about topics you care about and sends them to where you need them (for example, to a data pipeline or a safe “mock” mode for testing). It helps teams stay on top of relevant news without manual searching or copy‑pasting.
+
+How it works, step by step:
+1. You choose a topic (e.g., “machine learning”) and optional filters (like a start date or number of articles).
+2. The app connects to The Guardian Open Platform using your API key (or a test placeholder in mock mode).
+3. It fetches matching articles and extracts key fields (title, URL, publish date, optional content preview).
+4. The articles are delivered to your chosen destination:
+   - AWS Kinesis Data Streams for production pipelines, or
+   - A built‑in mock broker for quick local testing without any cloud setup.
+5. A clear summary tells you how many items were found and successfully published.
+
 ## 🚀 Quick Start
 
 For a step-by-step, friendly onboarding (prerequisites, installation,
@@ -39,8 +52,6 @@ reference information you may need after the initial setup.
 
 - **Need a guided walkthrough?** Follow the instructions in [`QUICKSTART.md`](./QUICKSTART.md) for
   cloning the repo, installing dependencies, configuring `.env`, and running smoke tests.
-- **Want the packaged release?** When the project is published to PyPI you can simply run
-  `pip install guardian-content-fetcher` on any machine with Python 3.8+.
 - **Environment variables.** Copy `env_template.txt` to `.env`, then fill in your Guardian API key
   and (optionally) AWS credentials. Quickstart explains every field in plain language.
 - **Prerequisites recap.** Python 3.8+, a Guardian API key, and AWS credentials only if you plan to
