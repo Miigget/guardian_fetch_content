@@ -32,19 +32,6 @@ pip install -r requirements-dev.txt
 pip install -e .
 ```
 
-### Verify your setup (quick checks)
-
-> ℹ️ Before running the checks, make sure the developer dependencies are installed (production `requirements.txt` alone does not include the tooling needed by `scripts/run_tests.py`):
->
-
-```bash
-# Full quality gate (install, tests+coverage, lint, security)
-python scripts/run_tests.py
-
-# Or a minimal smoke test with the mock broker
-guardian-fetch "test" --use-mock --max-articles 1 --verbose
-```
-
 ## Step 3: Configure Environment (1 minute)
 
 Copy the template to create your local `.env`:
@@ -59,10 +46,41 @@ GUARDIAN_API_KEY=your-actual-api-key-here
 
 > ℹ️ Tip for development: when using the mock broker, you can set `GUARDIAN_API_KEY=test`. Replace it with your real key in production.
 
-## Step 4: Test with Mock Broker (30 seconds)
+## Step 4: Test Your Setup
+
+> ℹ️ Before running the checks, make sure the developer dependencies are installed (production `requirements.txt` alone does not include the tooling needed by `scripts/run_tests.py`):
+>
+ ```bash
+ pip install -r requirements-dev.txt
+ ```
 
 ```bash
-# Test with mock broker (no AWS needed)
+# Run the full quality gate (install, tests+coverage, lint, security)
+python scripts/run_tests.py
+```
+
+The optional flags below let you run each quality gate independently, so you can execute only the part you need at any moment.
+
+```bash
+# Only run unit tests (add --coverage for report, -v for verbose pytest)
+python scripts/run_tests.py --tests-only --coverage -v
+
+# Only run style/format checks (Flake8 + Black)
+python scripts/run_tests.py --lint-only
+
+# Only run security scanning with Bandit (JSON output saved to bandit-report.json)
+python scripts/run_tests.py --security-only
+
+# Only verify editable installation works
+python scripts/run_tests.py --install-only
+```
+
+## Step 5: Test with Mock Broker (30 seconds)
+
+```bash
+# Quick functionality tests (no AWS needed)
+guardian-fetch "test" --use-mock --max-articles 1
+
 guardian-fetch "machine learning" --use-mock --verbose
 ```
 
@@ -77,21 +95,24 @@ Articles published: 10
 Success: Yes
 ```
 
-## Step 5: Set Up AWS Kinesis for CLI Usage (Optional, 2 minutes)
+## Step 6: Set Up AWS Kinesis for CLI Usage (Optional, 2 minutes)
 
 If you want to use real AWS Kinesis via CLI:
 
-```bash
-# Add AWS credentials to .env
-echo "AWS_ACCESS_KEY_ID=your-aws-key" >> .env
-echo "AWS_SECRET_ACCESS_KEY=your-aws-secret" >> .env
-echo "KINESIS_STREAM_NAME=guardian-content" >> .env
+Open `.env` and add the AWS settings (or verify they exist):
+```
+AWS_ACCESS_KEY_ID=your-aws-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret
+AWS_DEFAULT_REGION=eu-west-2
+KINESIS_STREAM_NAME=guardian-content
+```
 
-# Create Kinesis stream (AWS CLI required)
+Then create the Kinesis stream (AWS CLI required):
+```bash
 aws kinesis create-stream --stream-name guardian-content --shard-count 1
 ```
 
-## Step 6: Deploy to AWS Lambda (Optional)
+## Step 7: Deploy to AWS Lambda (Optional)
 
 You can run this tool as a serverless function on AWS Lambda, which is ideal for scheduled or event-driven execution.
 
@@ -160,39 +181,8 @@ python -m guardian_content_fetcher.cli "machine learning" --use-mock
 
 **Rate limiting errors**
 ```bash
-# Use longer delays between requests
+# Use longer delays between requests (in seconds)
 echo "GUARDIAN_RATE_LIMIT_DELAY=3.0" >> .env
-```
-
-### Test Your Setup
-> Prefer the “Verify your setup (quick checks)” under Step 2 above. The commands below are equivalent and kept for reference.
-
-> ℹ️ Before running the checks, make sure the developer dependencies are installed (production `requirements.txt` alone does not include the tooling needed by `scripts/run_tests.py`):
->
- ```bash
- pip install -r requirements-dev.txt
- ```
-
-```bash
-# Run the full quality gate (install, tests+coverage, lint, security)
-python scripts/run_tests.py
-
-# Only run unit tests (add --coverage for report, -v for verbose pytest)
-python scripts/run_tests.py --tests-only --coverage -v
-
-# Only run style/format checks (Flake8 + Black)
-python scripts/run_tests.py --lint-only
-
-# Only run security scanning with Bandit (JSON output saved to bandit-report.json)
-python scripts/run_tests.py --security-only
-
-# Only verify editable installation works
-python scripts/run_tests.py --install-only
-```
-
-```bash
-# Quick functionality test
-guardian-fetch "test" --use-mock --max-articles 1
 ```
 
 ## Next Steps
@@ -211,27 +201,9 @@ Once you have the basic setup working:
 - **Issues**: Report bugs on GitHub
 - **Configuration**: See `env_template.txt` for all options
 
-## Configuration Reference
-
-### Minimal Configuration (.env)
-```bash
-GUARDIAN_API_KEY=your-api-key-here
-USE_MOCK_BROKER=true
-```
-
-### Production Configuration (.env)
-```bash
-GUARDIAN_API_KEY=your-api-key-here
-AWS_ACCESS_KEY_ID=your-aws-key
-AWS_SECRET_ACCESS_KEY=your-aws-secret
-AWS_DEFAULT_REGION=eu-west-2
-KINESIS_STREAM_NAME=guardian-content
-LOG_LEVEL=INFO
-```
-
 Notes:
-- Local/EC2/containers: set `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` here or rely on the instance profile/credential provider chain.
 - AWS Lambda: do not put static access keys in `.env`. Use the function’s IAM role for AWS credentials. Only set non-secret variables like `KINESIS_STREAM_NAME` and `LOG_LEVEL`. Leave `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` unset.
+
 ## Success! 🎉
 
 You're now ready to fetch Guardian articles and publish them to message brokers. 
