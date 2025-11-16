@@ -10,6 +10,8 @@ Get up and running with Guardian Content Fetcher in under 5 minutes! 🚀
 
 ## Step 1: Get Guardian API Key (2 minutes)
 
+> ℹ️ We recommend requesting your API key now. For quick local testing you can skip this step for the moment — set `GUARDIAN_API_KEY=test` in Step 3, then switch to your real key for production.
+
 1. Go to [Guardian Open Platform](https://open-platform.theguardian.com/access/)
 2. Click "Register for an API key"
 3. Fill out the form (it's free!)
@@ -79,8 +81,6 @@ python scripts/run_tests.py --install-only
 
 ```bash
 # Quick functionality tests (no AWS needed)
-guardian-fetch "test" --use-mock --max-articles 1
-
 guardian-fetch "machine learning" --use-mock --verbose
 ```
 
