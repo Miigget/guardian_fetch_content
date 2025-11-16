@@ -149,10 +149,30 @@ echo "GUARDIAN_RATE_LIMIT_DELAY=3.0" >> .env
 
 ### Test Your Setup
 
-```bash
-# Run all tests to verify everything works
-python scripts/run_tests.py --tests-only
+> ℹ️ Before running the checks, make sure the developer dependencies are installed (production `requirements.txt` alone does not include the tooling needed by `scripts/run_tests.py`):
+>
+ ```bash
+ pip install -r requirements-dev.txt
+ ```
 
+```bash
+# Run the full quality gate (install, tests+coverage, lint, security)
+python scripts/run_tests.py
+
+# Only run unit tests (add --coverage for report, -v for verbose pytest)
+python scripts/run_tests.py --tests-only --coverage -v
+
+# Only run style/format checks (Flake8 + Black)
+python scripts/run_tests.py --lint-only
+
+# Only run security scanning with Bandit (JSON output saved to bandit-report.json)
+python scripts/run_tests.py --security-only
+
+# Only verify editable installation works
+python scripts/run_tests.py --install-only
+```
+
+```bash
 # Quick functionality test
 guardian-fetch "test" --use-mock --max-articles 1
 ```
@@ -186,7 +206,7 @@ USE_MOCK_BROKER=true
 GUARDIAN_API_KEY=your-api-key-here
 AWS_ACCESS_KEY_ID=your-aws-key
 AWS_SECRET_ACCESS_KEY=your-aws-secret
-AWS_DEFAULT_REGION=us-east-1
+AWS_DEFAULT_REGION=eu-west-2
 KINESIS_STREAM_NAME=guardian-content
 LOG_LEVEL=INFO
 ```

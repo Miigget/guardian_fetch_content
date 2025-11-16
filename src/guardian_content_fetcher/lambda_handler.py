@@ -8,10 +8,10 @@ configuration from environment variables, and invoking the core fetching logic.
 
 import json
 import logging
-import os
 from typing import Dict, Any
 
 from .content_fetcher import GuardianContentFetcherFactory, GuardianContentFetcherError
+from .config import load_config_from_env, ConfigurationError
 
 # Configure logging for Lambda's CloudWatch
 logger = logging.getLogger()
@@ -52,26 +52,29 @@ def handler(event: Dict[str, Any], context: object) -> Dict[str, Any]:
         max_articles = int(event.get("max_articles", 10))
 
         # --- 2. Load Configuration from Environment Variables ---
-        guardian_api_key = os.environ.get("GUARDIAN_API_KEY")
-        kinesis_stream_name = os.environ.get("KINESIS_STREAM_NAME")
-        aws_region = os.environ.get("AWS_DEFAULT_REGION", "eu-west-2")
+        config = load_config_from_env()
 
-        if not guardian_api_key or not kinesis_stream_name:
+        # Validate that Kinesis config is available (not using mock)
+        if not config.kinesis_config:
             raise EnvironmentError(
-                "Missing required environment variables: GUARDIAN_API_KEY "
-                "and KINESIS_STREAM_NAME must be set."
+                "Kinesis configuration is required for Lambda. "
+                "Set KINESIS_STREAM_NAME environment variable and ensure "
+                "USE_MOCK_BROKER is not set to 'true'."
             )
 
         # --- 3. Execute the Fetch and Publish Logic ---
         logger.info(
             f"Initializing fetcher for Kinesis stream "
-            f"'{kinesis_stream_name}' in region '{aws_region}'"
+            f"'{config.kinesis_config.stream_name}' in region "
+            f"'{config.kinesis_config.aws_config.region}'"
         )
 
         fetcher = GuardianContentFetcherFactory.create_with_kinesis(
-            guardian_api_key=guardian_api_key,
-            kinesis_stream_name=kinesis_stream_name,
-            aws_region=aws_region,
+            guardian_api_key=config.guardian_config.api_key,
+            kinesis_stream_name=config.kinesis_config.stream_name,
+            aws_region=config.kinesis_config.aws_config.region,
+            aws_access_key_id=config.kinesis_config.aws_config.access_key_id,
+            aws_secret_access_key=config.kinesis_config.aws_config.secret_access_key,
         )
 
         with fetcher:
@@ -84,7 +87,7 @@ def handler(event: Dict[str, Any], context: object) -> Dict[str, Any]:
         # --- 4. Return a Success Response ---
         return {"statusCode": 200, "body": json.dumps(result)}
 
-    except (ValueError, EnvironmentError) as e:
+    except (ValueError, EnvironmentError, ConfigurationError) as e:
         logger.error(f"Configuration or parameter error: {e}")
         return {"statusCode": 400, "body": json.dumps({"error": str(e)})}
     except GuardianContentFetcherError as e:

@@ -119,7 +119,7 @@ class TestLoadConfiguration:
     def test_load_configuration_missing_api_key(self, cli_args):
         """Test configuration loading with missing API key."""
         with patch.dict("os.environ", {}, clear=True):
-            with pytest.raises(CLIError, match="Guardian API key is required"):
+            with pytest.raises(CLIError, match="GUARDIAN_API_KEY"):
                 load_configuration(cli_args)
 
     def test_load_configuration_override_env_vars(self, mock_environment_variables):

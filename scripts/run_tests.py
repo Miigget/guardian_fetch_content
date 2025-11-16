@@ -71,14 +71,6 @@ def run_linting():
     
     return success
 
-# Type checking removed - not required by project specification
-# def run_type_checking():
-#     """Run static type checking with mypy."""
-#     return run_command(
-#         ["python", "-m", "mypy", "src/guardian_content_fetcher/", "--ignore-missing-imports"],
-#         "Running static type checking with MyPy"
-#     )
-
 def run_security_checks():
     """Run security vulnerability checks (required by project spec)."""
     # Bandit for security issues - REQUIRED by task_description_pl.md
@@ -171,13 +163,6 @@ Examples:
         action="store_true",
         help="Run only linting checks"
     )
-    
-    # Type checking removed - not required by project
-    # parser.add_argument(
-    #     "--type-check-only",
-    #     action="store_true",
-    #     help="Run only type checking"
-    # )
     
     parser.add_argument(
         "--security-only",

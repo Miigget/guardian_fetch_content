@@ -9,7 +9,6 @@ main fetching and publishing workflow.
 import argparse
 import json
 import logging
-import os
 import sys
 from typing import Dict, Any
 from dotenv import load_dotenv
@@ -17,6 +16,7 @@ from dotenv import load_dotenv
 from .content_fetcher import GuardianContentFetcherFactory, GuardianContentFetcherError
 from .api_client import GuardianAPIError
 from .message_broker import MessageBrokerError
+from .config import load_config_from_env, ConfigurationError
 
 # Load environment variables from .env file if it exists
 load_dotenv()
@@ -104,7 +104,7 @@ Environment Variables:
     parser.add_argument(
         "--aws-region",
         type=str,
-        help="AWS region (overrides AWS_DEFAULT_REGION env var, default: us-east-1)",
+        help="AWS region (overrides AWS_DEFAULT_REGION env var, default: eu-west-2)",
     )
 
     parser.add_argument(
@@ -153,37 +153,41 @@ def load_configuration(args: argparse.Namespace) -> Dict[str, Any]:
     Raises:
         CLIError: If required configuration is missing
     """
-    config = {}
+    try:
+        # Load base configuration from environment using config module
+        app_config = load_config_from_env()
+    except ConfigurationError as e:
+        raise CLIError(str(e))
 
-    # Guardian API key (required)
-    config["guardian_api_key"] = os.getenv("GUARDIAN_API_KEY")
-    if not config["guardian_api_key"]:
-        raise CLIError(
-            "Guardian API key is required. Set GUARDIAN_API_KEY environment variable."
-        )
+    # Extract AWS/Kinesis config if available
+    aws_region = "eu-west-2"
+    aws_access_key_id = None
+    aws_secret_access_key = None
+    kinesis_stream_name = "guardian-content"
+    
+    if app_config.kinesis_config:
+        aws_region = app_config.kinesis_config.aws_config.region
+        aws_access_key_id = app_config.kinesis_config.aws_config.access_key_id
+        aws_secret_access_key = app_config.kinesis_config.aws_config.secret_access_key
+        kinesis_stream_name = app_config.kinesis_config.stream_name
 
-    # AWS configuration
-    config["aws_region"] = args.aws_region or os.getenv(
-        "AWS_DEFAULT_REGION", "eu-west-2"
-    )
-    config["aws_access_key_id"] = os.getenv("AWS_ACCESS_KEY_ID")
-    config["aws_secret_access_key"] = os.getenv("AWS_SECRET_ACCESS_KEY")
-
-    # Kinesis stream configuration
-    config["kinesis_stream_name"] = args.stream_name or os.getenv(
-        "KINESIS_STREAM_NAME", "guardian-content"
-    )
-
-    # Search parameters
-    config["search_term"] = args.search_term
-    config["date_from"] = args.date_from
-    config["max_articles"] = args.max_articles
-
-    # CLI options
-    config["use_mock"] = args.use_mock
-    config["output_format"] = args.output_format
-    config["verbose"] = args.verbose
-    config["quiet"] = args.quiet
+    # Build CLI-specific config dict, starting with env-based values
+    # Command line arguments override environment variables
+    config = {
+        "guardian_api_key": app_config.guardian_config.api_key,
+        "aws_region": args.aws_region or aws_region,
+        "aws_access_key_id": aws_access_key_id,
+        "aws_secret_access_key": aws_secret_access_key,
+        "kinesis_stream_name": args.stream_name or kinesis_stream_name,
+        # CLI-specific parameters
+        "search_term": args.search_term,
+        "date_from": args.date_from,
+        "max_articles": args.max_articles,
+        "use_mock": args.use_mock,
+        "output_format": args.output_format,
+        "verbose": args.verbose,
+        "quiet": args.quiet,
+    }
 
     logger.debug(f"Loaded configuration: {config}")
     return config

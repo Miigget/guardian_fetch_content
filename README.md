@@ -8,33 +8,17 @@
 
 ## 🚀 Quick Start
 
-### Installation
+For a step-by-step, friendly onboarding (prerequisites, installation,
+environment setup, sample commands, troubleshooting), open the dedicated
+[`QUICKSTART.md`](./QUICKSTART.md). That document is the canonical source for:
 
-```bash
-# Clone the repository
-git clone <repository-url>
-cd guardian_fetch_content
+- Installing and testing the project locally.
+- Preparing the `.env` file with your Guardian API key and optional AWS credentials.
+- Running the CLI in mock or AWS-backed modes.
+- Verifying the setup with the bundled quality gate (`scripts/run_tests.py`).
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Install the package in development mode
-pip install -e .
-```
-
-### Basic Usage
-
-```bash
-# Set up environment variables (see Configuration section)
-export GUARDIAN_API_KEY="your-guardian-api-key"
-export KINESIS_STREAM_NAME="guardian-content"
-
-# Search for articles and publish to Kinesis
-guardian-fetch "machine learning" --date-from 2023-01-01
-
-# Or use mock broker for testing
-guardian-fetch "artificial intelligence" --use-mock --verbose
-```
+The rest of this README focuses on what the project does, how it is structured, and
+reference information you may need after the initial setup.
 
 ## 📋 Features
 
@@ -48,51 +32,25 @@ guardian-fetch "artificial intelligence" --use-mock --verbose
 - ✅ **Error Handling**: Graceful error handling with fallback strategies
 - ✅ **Security**: No credentials stored in code, environment variable configuration
 - ✅ **Testing**: 90%+ test coverage with unit tests and integration tests
-- ✅ **Type Safety**: Static type checking with MyPy
+- ✅ **Type Hints**: Full type annotations for better code clarity
 - ✅ **Code Quality**: PEP-8 compliance, security scanning with Bandit
 
 ## 🛠 Installation & Setup
 
-### Prerequisites
-
-- Python 3.8 or higher
-- Guardian API key (free tier available)
-- AWS credentials (for Kinesis publishing)
-
-### Step 1: Get Guardian API Key
-
-1. Visit [Guardian Open Platform](https://open-platform.theguardian.com/access/)
-2. Register for a free API key
-3. Note the rate limits (12 requests per second for free tier)
-
-### Step 2: Install the Package
-
-```bash
-# From source
-git clone <repository-url>
-cd guardian_fetch_content
-pip install -r requirements.txt
-pip install -e .
-
-# Or using pip (when published)
-pip install guardian-content-fetcher
-```
-
-### Step 3: Configure Environment
-
-Create a `.env` file based on the template:
-
-```bash
-# Copy the template
-cp env_template.txt .env
-
-# Edit with your credentials
-nano .env
-```
+- **Need a guided walkthrough?** Follow the instructions in [`QUICKSTART.md`](./QUICKSTART.md) for
+  cloning the repo, installing dependencies, configuring `.env`, and running smoke tests.
+- **Want the packaged release?** When the project is published to PyPI you can simply run
+  `pip install guardian-content-fetcher` on any machine with Python 3.8+.
+- **Environment variables.** Copy `env_template.txt` to `.env`, then fill in your Guardian API key
+  and (optionally) AWS credentials. Quickstart explains every field in plain language.
+- **Prerequisites recap.** Python 3.8+, a Guardian API key, and AWS credentials only if you plan to
+  push data to Kinesis. Mock mode works without AWS access.
 
 ## ⚙️ Configuration
 
-The application uses environment variables for configuration. See `env_template.txt` for all options:
+The application is configured entirely through environment variables. `env_template.txt` and the
+Quick Start Guide explain each field in detail; the snippets below highlight the most important
+values so you can quickly see what's available.
 
 ### Required Configuration
 
@@ -107,7 +65,7 @@ GUARDIAN_API_KEY=your-guardian-api-key-here
 # AWS credentials (optional if using IAM roles)
 AWS_ACCESS_KEY_ID=your-aws-access-key-id
 AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
-AWS_DEFAULT_REGION=us-east-1
+AWS_DEFAULT_REGION=eu-west-2
 
 # Kinesis stream name
 KINESIS_STREAM_NAME=guardian-content
@@ -126,60 +84,13 @@ LOG_LEVEL=INFO
 GUARDIAN_RATE_LIMIT_DELAY=2.0
 ```
 
-## 📖 Usage Examples
+## 📖 Usage
 
-### Command Line Interface
-
-```bash
-# Basic usage
-guardian-fetch "machine learning"
-
-# With date filter and custom article count
-guardian-fetch "artificial intelligence" --date-from 2023-01-01 --max-articles 15
-
-# Using custom Kinesis stream
-guardian-fetch "data science" --stream-name my-custom-stream
-
-# Using mock publisher for testing
-guardian-fetch "python programming" --use-mock --verbose
-
-# JSON output format
-guardian-fetch "cloud computing" --output-format json
-
-# Interactive mode (no arguments)
-guardian-fetch
-```
-
-### Python API
-
-```python
-from guardian_content_fetcher import GuardianContentFetcherFactory
-
-# Using Kinesis publisher
-fetcher = GuardianContentFetcherFactory.create_with_kinesis(
-    guardian_api_key="your-api-key",
-    kinesis_stream_name="guardian-content",
-    aws_region="us-east-1"
-)
-
-# Fetch and publish articles
-result = fetcher.fetch_and_publish(
-    search_term="machine learning",
-    date_from="2023-01-01",
-    max_articles=10
-)
-
-print(f"Published {result['articles_published']} articles")
-
-# Using mock publisher for testing
-test_fetcher = GuardianContentFetcherFactory.create_with_mock(
-    guardian_api_key="your-api-key"
-)
-
-result = test_fetcher.fetch_and_publish("python programming")
-```
-
-### Advanced Usage
+- **Need CLI or basic Python examples?** Use the scenarios documented in
+  [`QUICKSTART.md`](./QUICKSTART.md); they cover searches, mock mode, JSON output, and interactive
+  runs.
+- **Prefer to wire components manually?** The advanced pattern below shows how to assemble the core
+  classes yourself.
 
 ```python
 from guardian_content_fetcher import (
@@ -194,7 +105,7 @@ api_client = GuardianAPIClient(
 
 kinesis_publisher = KinesisPublisher(
     stream_name="my-stream",
-    region_name="eu-west-1"
+    region_name="eu-west-2"
 )
 
 # Create fetcher with custom components
@@ -220,7 +131,8 @@ guardian_fetch_content/
 │   ├── test_message_broker.py  # Message broker tests
 │   ├── test_content_fetcher.py # Main class tests
 │   ├── test_config.py          # Configuration tests
-│   └── test_cli.py             # CLI tests
+│   ├── test_cli.py             # CLI tests
+│   └── test_lambda_handler.py  # Lambda handler tests
 ├── scripts/                    # Helper scripts
 │   ├── run_tests.py           # Test runner script
 │   └── build_lambda_package.py # Lambda deployment packager
@@ -231,41 +143,20 @@ guardian_fetch_content/
 ├── .flake8                     # Flake8 linting configuration (88 chars)
 ├── pytest.ini                  # Test configuration
 ├── env_template.txt             # Environment configuration template
-├── README.md                    # This file
-├── CONTRIBUTING.md              # Contribution guidelines
+├── README.md                    # Overview & reference (this file)
+├── QUICKSTART.md                # Step-by-step setup guide
+├── DEPLOY_LAMBDA.md             # AWS Lambda deployment how-to
 └── CODE_STYLE.md               # Detailed code style documentation
 ```
 
 ## 🧪 Testing
 
-The project includes comprehensive tests with 90%+ coverage:
-
-```bash
-# Run all tests with coverage
-python scripts/run_tests.py
-
-# Run only unit tests
-python scripts/run_tests.py --tests-only
-
-# Run with verbose output
-python scripts/run_tests.py --verbose
-
-# Run specific test categories
-python -m pytest tests/ -v
-python -m pytest tests/test_api_client.py -v
-```
-
-### Quality Checks
-
-```bash
-# Run all quality checks (unit tests, PEP-8, security)
-python scripts/run_tests.py
-
-# Individual checks
-python scripts/run_tests.py --tests-only    # Unit tests only
-python scripts/run_tests.py --lint-only     # Code style (flake8, black)
-python scripts/run_tests.py --security-only # Security (bandit)
-```
+- `python scripts/run_tests.py` runs the entire quality gate (package install check, unit tests with
+  coverage, linting, and security scan).
+- Quickstart documents every flag (`--tests-only`, `--lint-only`, `--security-only`, `--install-only`,
+  `--coverage`, `-v`) plus troubleshooting steps if any tool fails.
+- Prefer raw `pytest` or `flake8` commands? Feel free to call them directly—`scripts/run_tests.py`
+  simply orchestrates the required checks described in `task_description_pl.md`.
 
 ## 🏗 Architecture
 
@@ -320,27 +211,47 @@ Success: Yes
 
 ### AWS Lambda
 
-The package is designed to work within AWS Lambda memory limits:
+The package is designed to work within AWS Lambda memory limits. For a full, click-by-click
+deployment walkthrough (packaging, IAM role, environment variables, and testing in the AWS
+console), see the dedicated guide: [`DEPLOY_LAMBDA.md`](./DEPLOY_LAMBDA.md).
 
 ```python
-# Lambda handler example
+# Lambda handler example (see lambda_handler.py for the actual implementation)
 import json
-from guardian_content_fetcher import load_config_from_env, GuardianContentFetcherFactory
+from guardian_content_fetcher import (
+    load_config_from_env,
+    GuardianContentFetcherFactory,
+    ConfigurationError
+)
 
 def lambda_handler(event, context):
+    # Load configuration from environment variables using config module
     config = load_config_from_env()
     
+    # Validate Kinesis config is available (Lambda requires real broker)
+    if not config.kinesis_config:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({
+                'error': 'Kinesis configuration required. Set KINESIS_STREAM_NAME.'
+            })
+        }
+    
+    # Create fetcher and execute
     fetcher = GuardianContentFetcherFactory.create_with_kinesis(
         guardian_api_key=config.guardian_config.api_key,
         kinesis_stream_name=config.kinesis_config.stream_name,
-        aws_region=config.kinesis_config.aws_config.region
+        aws_region=config.kinesis_config.aws_config.region,
+        aws_access_key_id=config.kinesis_config.aws_config.access_key_id,
+        aws_secret_access_key=config.kinesis_config.aws_config.secret_access_key,
     )
     
-    result = fetcher.fetch_and_publish(
-        search_term=event['search_term'],
-        date_from=event.get('date_from'),
-        max_articles=event.get('max_articles', 10)
-    )
+    with fetcher:
+        result = fetcher.fetch_and_publish(
+            search_term=event['search_term'],
+            date_from=event.get('date_from'),
+            max_articles=event.get('max_articles', 10)
+        )
     
     return {
         'statusCode': 200,
@@ -367,57 +278,28 @@ CMD ["guardian-fetch", "--help"]
 
 ### Setting up Development Environment
 
-```bash
-# Clone and setup
-git clone <repository-url>
-cd guardian_fetch_content
-python -m venv venv
-source venv/bin/activate  # or `venv\Scripts\activate` on Windows
-pip install -r requirements.txt
-pip install -e .
+- Start with the instructions in [`QUICKSTART.md`](./QUICKSTART.md) to clone the repository, install
+  dependencies, configure `.env`, and run the smoke tests.
+- Create an isolated virtual environment so your global Python installation stays clean:
+  `python -m venv venv && source venv/bin/activate` (Windows: `venv\Scripts\activate`).
+- Install the extra tooling required for linting, formatting, and security scans:
 
-# Install development dependencies
-pip install -r requirements-dev.txt
-```
+  ```bash
+  pip install -r requirements-dev.txt
+  ```
 
 ### Code Quality Standards
 
-As required by project specification (task_description_pl.md):
+As required by project specification:
 
-- **Style**: Black formatting (88 char), Flake8 linting (88 char) - PEP-8 compliant
 - **Testing**: 90%+ test coverage requirement with pytest
 - **Security**: Bandit security scanning for vulnerabilities
 - **Documentation**: Comprehensive docstrings and comments
-
-#### Code Style & Line Length
-
-This project uses **88 characters** as the maximum line length (Black's default):
-
-```bash
-# Format code with Black
-black src/ tests/
-
-# Check with Flake8 (configured for 88 chars in .flake8)
-flake8 src/ tests/
-```
-
-**Why 88 characters instead of PEP-8's 79?**
-- Black's default, widely accepted in the Python community
-- ~10% more space = fewer line breaks, better readability
-- Used by major projects: Django, pytest, FastAPI
-- More readable on modern displays
+- **Style**: Black formatting (88 char), Flake8 linting (88 char) - PEP-8 compliant
 
 **To switch to strict PEP-8 (79 characters):**
 
-See detailed instructions in [CODE_STYLE.md](CODE_STYLE.md) or [CONTRIBUTING.md](CONTRIBUTING.md#line-length-configuration)
-
-### Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make changes with tests
-4. Run quality checks: `python scripts/run_tests.py`
-5. Submit a pull request
+See detailed instructions in [CODE_STYLE.md](CODE_STYLE.md)
 
 ## 📚 API Reference
 
@@ -447,22 +329,11 @@ Abstract base class for message broker implementations.
 - `publish_message(message)`: Publish single message
 - `publish_batch(messages)`: Publish multiple messages
 
-## 📝 Changelog
-
-### Version 1.0.0
-
-- Initial release
-- Guardian API integration
-- AWS Kinesis support
-- CLI interface
-- Comprehensive test suite
-- Security and quality checks
-
 ## 🤝 Support
 
 For questions, issues, or contributions:
 
-1. Check existing [GitHub issues](https://github.com/your-repo/issues)
+1. Check existing [GitHub issues](https://github.com/Miigget/guardian_fetch_content/issues)
 2. Create a new issue with detailed description
 3. For security issues, please email directly
 
@@ -477,20 +348,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Python community for excellent libraries
 
 ---
-
-**Project Requirements Fulfilled:**
-
-✅ Guardian API integration with rate limiting  
-✅ AWS Kinesis message broker support  
-✅ Python 3.8+ with PEP-8 compliance (88 char line length via Black)  
-✅ Comprehensive unit testing (90%+ coverage)  
-✅ Security vulnerability scanning (Bandit: 0 issues)  
-✅ Environment variable configuration (no hardcoded credentials)  
-✅ AWS Lambda compatible memory footprint  
-✅ CLI interface for local demonstration  
-✅ JSON message format with required fields  
-✅ Content preview extension (first 1000 characters)  
-✅ Error handling and logging  
-✅ Documentation and code comments  
-
-**Code Style Note:** This project uses Black's 88-character line limit (widely accepted standard) rather than PEP-8's strict 79 characters. Both Black and Flake8 are configured consistently. Instructions to switch to 79 characters are provided in CONTRIBUTING.md if required.
